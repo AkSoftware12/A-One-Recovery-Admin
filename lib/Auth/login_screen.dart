@@ -22,7 +22,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -32,6 +32,26 @@ class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
 
   List loginStudent = []; // Declare a list to hold API data
+
+
+
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    // AnimationController setup
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); // auto reverse karega
+
+    // Tween animation for scaling
+    _animation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
 
 
   // Future<void> _login() async {
@@ -149,46 +169,57 @@ class _LoginPageState extends State<LoginPage> {
                     SizedBox(height: TextSizes.padding20),
                     // extra spacing at top if needed
 
-                    Stack(
-                      children: [
-                        SizedBox(
-                          height: 130.sp,
-                          width: 130.sp,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.3),
-                                  spreadRadius: 5,
-                                  blurRadius: 15,
-                                  offset: Offset(0, 5),
+                    AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: _animation.value,
+                          child:Stack(
+                            children: [
+                              SizedBox(
+                                height: 110.sp,
+                                width: 110.sp,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.white.withOpacity(0.3),
+                                        spreadRadius: 5,
+                                        blurRadius: 15,
+                                        offset: Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(90),
+                                    child: Container(
+                                      color: HexColor('#2c3543'),
+                                    ),
+                                  ),
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(90),
-                              child: Container(
-                                color: HexColor('#2c3543'),
                               ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(TextSizes.padding8),
-                          child: SizedBox(
-                            height: 115.sp,
-                            width: 115.sp,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(90),
-                              child: Image.asset(
-                                'assets/aonelogo.png',
+                              Padding(
+                                padding: EdgeInsets.all(TextSizes.padding8),
+                                child: SizedBox(
+                                  height: 95.sp,
+                                  width: 95.sp,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(90),
+                                    child: Image.asset(
+                                      'assets/aonelogo.png',
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
+
+
+
 
                     SizedBox(height: TextSizes.padding20),
 
