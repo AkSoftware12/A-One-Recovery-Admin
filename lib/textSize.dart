@@ -16,6 +16,7 @@ class TextSizes {
   static  double text18 = 18.sp;
   static  double text19 = 19.sp;
   static  double text20 = 20.sp;
+  static  double text25 = 25.sp;
 
 
 
@@ -34,5 +35,6 @@ class TextSizes {
   static  double padding18 = 18.sp;
   static  double padding19 = 19.sp;
   static  double padding20 = 20.sp;
+  static  double padding30 = 30.sp;
 
 }

@@ -7,6 +7,7 @@ class AppStrings {
   static const unexpectedError = 'An unexpected error occurred. Please try again.';
   static const login = 'Login';
   static const email = 'Email';
+  static const employeeId = 'Admin ID';
   static const invalidEmail = 'Invalid email address';
   static const password = 'Password';
   static const passwordRequired = 'Password is required';
@@ -31,10 +32,11 @@ class AppStrings {
 
 
 
-  static const welcomeBack = 'Welcome Back';
+  static const welcomeBack = 'Welcome Admin!';
   static const welcomebottomtext = 'Sign in to continue to A1 Recovery';
   static const signIn = 'Sign in';
-  static const signBottomText = 'Login with your employee credentials\n © 2025 A1 Recovery. Collection & Repossession';
+  static const recovery = "Here's your recovery overview";
+  static const signBottomText = 'Login with your admin credentials\n © 2025 A1 Recovery. Collection & Repossession';
 
 
 }

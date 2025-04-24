@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       body: Container(
         height: double.infinity,
         width: double.infinity,
@@ -149,14 +149,18 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.bgBlack,
-              AppColors.bgBlack,
-              AppColors.bgYellow,
-              AppColors.bgYellow,
-              AppColors.bgYellow,
+              AppColors.topBg,   // top
+              AppColors.bottomBg,  // middle
             ],
+            // stops: [
+            //   0.0,   // top
+            //   0.0,   // top
+            //   0.7,   // 50% pe yellow
+            //   1.0,   // bottom pe black
+            // ],
           ),
         ),
+
         child: Center(
           child: SafeArea(
             child: SingleChildScrollView(
@@ -194,7 +198,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(90),
                                     child: Container(
-                                      color: HexColor('#2c3543'),
+                                      color: AppColors.bottomBg,
                                     ),
                                   ),
                                 ),
@@ -247,7 +251,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   style: GoogleFonts.poppins(
                                     fontSize: TextSizes.text18,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.bgYellow,
+                                    color: AppColors.textBlack,
                                   ),
                                 ),
                                 Text(
@@ -255,7 +259,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   style: GoogleFonts.poppins(
                                     fontSize: TextSizes.text12,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.textWhite,
+                                    color: AppColors.textBlack,
                                   ),
                                 ),
                               ],
@@ -268,15 +272,15 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   CupertinoIcons.person,
-                                  color: AppColors.textHint,
+                                  color: AppColors.bgYellow,
                                 ),
-                                hintText: AppStrings.email,
+                                hintText: AppStrings.employeeId,
                                 hintStyle: TextStyle(
                                   color: AppColors.textHint,
                                   fontSize: TextSizes.text13,
                                 ),
                                 filled: true,
-                                fillColor: AppColors.textFieldBg,
+                                fillColor: AppColors.bottomBg,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                       TextSizes.padding11),
@@ -311,7 +315,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               style: TextStyle(
                                 fontSize: TextSizes.text13,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textWhite,
+                                color: AppColors.textBlack,
                               ),
                             ),
 
@@ -323,7 +327,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               decoration: InputDecoration(
                                 prefixIcon: Icon(
                                   CupertinoIcons.padlock_solid,
-                                  color: AppColors.textHint,
+                                  color: AppColors.bgYellow,
                                 ),
                                 hintText: AppStrings.password,
                                 hintStyle: TextStyle(
@@ -335,7 +339,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     _isPasswordVisible
                                         ? CupertinoIcons.eye_slash_fill
                                         : CupertinoIcons.eye_solid,
-                                    color: AppColors.textHint,
+                                    color: AppColors.bgYellow,
                                   ),
                                   onPressed: () {
                                     setState(() {
@@ -344,7 +348,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   },
                                 ),
                                 filled: true,
-                                fillColor: AppColors.textFieldBg,
+                                fillColor: AppColors.bottomBg,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
                                   borderSide: BorderSide(
@@ -372,7 +376,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                               style: TextStyle(
                                 fontSize: TextSizes.text13,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textWhite,
+                                color: AppColors.textBlack,
                               ),
                             ),
 
@@ -410,7 +414,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     if (states.contains(MaterialState.selected)) {
                                       return AppColors.bgYellow;  // active color
                                     }
-                                    return AppColors.textHint;          // inactive color
+                                    return AppColors.bottomBg;          // inactive color
                                   }),
                                 ),
 
@@ -429,7 +433,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   style: GoogleFonts.poppins(
                                     fontSize: TextSizes.text12,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.textWhite,
+                                    color: AppColors.textBlack,
                                   ),
                                 ),
                               ],
@@ -469,7 +473,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                   style: GoogleFonts.poppins(
                                     fontSize: TextSizes.text12,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.textWhite,
+                                    color: AppColors.textBlack,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),

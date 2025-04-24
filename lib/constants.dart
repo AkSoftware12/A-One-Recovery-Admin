@@ -16,12 +16,19 @@ class AppColors {
 
 
   // Success color (green)
-  static  Color bgYellow = HexColor('#E8A84B'); // Success color (green)
-  static  Color bgBlack = HexColor('#181818'); // Success color (green)
-  static  Color bgLoginCard = HexColor('#393c44'); // Success color (green)
+  // static  Color bgYellow = HexColor('#E8A84B'); // Success color (green)
+  static  Color bgYellow = HexColor('#1935af'); // Success color (green)
+  // static  Color bgBlack = HexColor('#181818'); // Success color (green)
+  static  Color bgBlack = HexColor('#3d2314'); // Success color (green)
+  static  Color bgLoginCard = HexColor('#fefefe'); // Success color (green)
   static  Color textFieldBg = HexColor('#434a56'); // Success color (green)
   static  Color textWhite  = HexColor('#ffffff'); // Success color (green)
+  static  Color subTitlewhite  = HexColor('#cbd5e0'); // Success color (green)
+  static  Color subTitleBlack  = HexColor('#666666'); // Success color (green)
+  static  Color textBlack  = HexColor('#000000'); // Success color (green)
   static  Color textHint  = HexColor('#a1aab5'); // Success color (green)
+  static  Color topBg  = HexColor('#c2e6ff'); // Success color (green)
+  static  Color bottomBg  = HexColor('#eef1f6'); // Success color (green)
 }
 
 class AppAssets {

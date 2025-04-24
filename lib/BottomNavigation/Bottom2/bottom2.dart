@@ -4,10 +4,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import '../../HexColorCode/HexColor.dart';
 import '../../bottomScreen/Home/home.dart';
 import '../../constants.dart';
+import '../../textSize.dart';
 
 BuildContext? testContext;
 
@@ -31,7 +34,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     ScrollController(),
   ];
 
-  NavBarStyle _navBarStyle = NavBarStyle.style3;
+  NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   @override
   void initState() {
@@ -117,20 +120,28 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
           _navBarStyle == NavBarStyle.style16 ||
           _navBarStyle == NavBarStyle.style17 ||
           _navBarStyle == NavBarStyle.style18
-          ? Colors.white
+          ? HexColor('#cbd5e0')
           : null;
 
   List<PersistentBottomNavBarItem> _navBarsItems() => [
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.home),
+      // icon:  Icon(Icons.home),
+      icon: FaIcon(FontAwesomeIcons.home,size: 16.sp,),
       title: "Home",
+      textStyle:GoogleFonts.poppins(
+        textStyle: Theme.of(context).textTheme.displayLarge,
+        fontSize: TextSizes.text12,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        color: AppColors.textblack,
+      ),
       opacity: 0.7,
       activeColorPrimary: AppColors.bottomBarBG,
       activeColorSecondary: _navBarStyle == NavBarStyle.style7 ||
           _navBarStyle == NavBarStyle.style10
           ? Colors.white
           : null,
-      inactiveColorPrimary: Colors.grey,
+      inactiveColorPrimary: HexColor('#cbd5e0'),
       scrollController: _scrollControllers.first,
       routeAndNavigatorSettings: RouteAndNavigatorSettings(
         initialRoute: "/",
@@ -141,37 +152,66 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
       ),
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.search),
-      title: "Search",
+      icon: FaIcon(FontAwesomeIcons.tasks,size: 16.sp,),
+      title: "Tasks",
+      textStyle:GoogleFonts.poppins(
+        textStyle: Theme.of(context).textTheme.displayLarge,
+        fontSize: TextSizes.text12,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        color: AppColors.textblack,
+      ),
       activeColorPrimary: AppColors.bottomBarBG,
       activeColorSecondary: _navBarStyle == NavBarStyle.style7 ||
           _navBarStyle == NavBarStyle.style10
           ? Colors.white
           : null,
-      inactiveColorPrimary: Colors.grey,
+      inactiveColorPrimary: HexColor('#cbd5e0'),
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.add),
-      title: "Add",
+      icon: FaIcon(FontAwesomeIcons.rupeeSign,size: 16.sp,),
+      title: "Salary",
+      textStyle:GoogleFonts.poppins(
+        textStyle: Theme.of(context).textTheme.displayLarge,
+        fontSize: TextSizes.text12,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        color: AppColors.textblack,
+      ),
       activeColorPrimary: AppColors.bottomBarBG,
-      inactiveColorPrimary: Colors.grey,
+      inactiveColorPrimary: HexColor('#cbd5e0'),
       activeColorSecondary: _getSecondaryItemColorForSpecificStyles(),
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.message),
-      title: "Messages",
+      icon: FaIcon(FontAwesomeIcons.calendarCheck,size: 16.sp,),
+      title: "Attendance",
+      textStyle:GoogleFonts.poppins(
+        textStyle: Theme.of(context).textTheme.displayLarge,
+        fontSize: TextSizes.text12,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        color: AppColors.textblack,
+      ),
       activeColorPrimary: AppColors.bottomBarBG,
-      inactiveColorPrimary: Colors.grey,
+      inactiveColorPrimary: HexColor('#cbd5e0'),
       activeColorSecondary: _navBarStyle == NavBarStyle.style7 ||
           _navBarStyle == NavBarStyle.style10
           ? Colors.white
           : null,
+      scrollController: _scrollControllers.last,
     ),
     PersistentBottomNavBarItem(
-      icon: const Icon(Icons.settings),
-      title: "Settings",
+      icon: FaIcon(FontAwesomeIcons.user,size: 16.sp,),
+      title: "Profile",
+      textStyle:GoogleFonts.poppins(
+        textStyle: Theme.of(context).textTheme.displayLarge,
+        fontSize: TextSizes.text12,
+        fontWeight: FontWeight.w500,
+        fontStyle: FontStyle.normal,
+        color: AppColors.textblack,
+      ),
       activeColorPrimary: AppColors.bottomBarBG,
-      inactiveColorPrimary: Colors.grey,
+      inactiveColorPrimary: HexColor('#cbd5e0'),
       activeColorSecondary: _navBarStyle == NavBarStyle.style7 ||
           _navBarStyle == NavBarStyle.style10
           ? Colors.white
@@ -181,93 +221,138 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
   ];
 
   Widget _buildAppBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Builder(
-              builder: (context) => Padding(
-                padding: EdgeInsets.all(0),
-                child: GestureDetector(
-                  onTap: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.width*0.1,
-                    width: MediaQuery.of(context).size.width*0.08,
-                    child: Image.asset('assets/menu.png',),
-                  ),
-                ),
-              ), // Ensure Scaffold is in context
-            ),
-
-
-            SizedBox(width: 12.sp),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Welcome !',
-                  style: GoogleFonts.montserrat(
-                    textStyle: Theme.of(context).textTheme.displayLarge,
-                    fontSize: 11.sp,
-                    fontWeight: FontWeight.w600,
-                    fontStyle: FontStyle.normal,
-                    color: AppColors.textWhite,
-                  ),
-                ),
-
-                GestureDetector(
-                  onTap: () {
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => LoginStudentPage(pass: '',),
-                    //   ),
-                    // );
-                  },
-                  child: Row(
-                    children: [
-                      Text(
-                        // studentData?['student_name'].toString()??'Student Name',
-                       'Student Name',
-                        style: GoogleFonts.montserrat(
-                          textStyle: Theme.of(context).textTheme.displayLarge,
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.w600,
-                          fontStyle: FontStyle.normal,
-                          color: AppColors.textWhite,
+    return Padding(
+      padding:  EdgeInsets.only(top: TextSizes.padding30),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Builder(
+                builder: (context) => Padding(
+                  padding: EdgeInsets.all(0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    child: Container(
+                      height: MediaQuery.of(context).size.width * 0.1,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.shade200, // background color, change as needed
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          )
+                        ],
+                      ),
+                      child: Center(
+                        child: Image.asset(
+                          'assets/menu.png',
+                          height: MediaQuery.of(context).size.width * 0.05,
+                          width: MediaQuery.of(context).size.width * 0.05,
+                          color: AppColors.textblack,
                         ),
                       ),
-                      Icon(Icons.arrow_drop_down, color: AppColors.primary),
-                    ],
+                    ),
                   ),
                 ),
+              ),
 
 
 
-              ],
+              SizedBox(width: 12.sp),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Admin!',
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w700,
+                      fontStyle: FontStyle.normal,
+                      color: AppColors.textWhite,
+                    ),
+                  ),
+                  Text(
+                    // studentData?['student_name'].toString()??'Student Name',
+                    'Admin ID : ${'2100101'}',
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: 11.sp,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.normal,
+                      color: AppColors.subTitlewhite,
+                    ),
+                  ),
+
+
+
+                ],
+              ),
+
+            ],
+          ),
+          Builder(
+            builder: (context) => Padding(
+              padding: EdgeInsets.all(0),
+              child: GestureDetector(
+                onTap: () {
+                  // Notification icon tapped
+                },
+                child: Stack(
+                  clipBehavior: Clip.none, // So badge can overflow outside stack
+                  children: [
+                    Icon(
+                      Icons.notification_add,
+                      color: AppColors.textWhite,
+                      size: 23.sp,
+                    ),
+
+
+                    // Notification Count Badge
+                    Positioned(
+                      right: -4, // adjust as needed
+                      top: -4,   // adjust as needed
+                      child: Container(
+                        padding: EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Center(
+                          child: Text(
+                            '3', // <-- your dynamic notification count here
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10.sp,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-
-          ],
-        ),
-        // Builder(
-        //   builder: (context) => Padding(
-        //     padding: EdgeInsets.all(0),
-        //     child: GestureDetector(
-        //         onTap: () {
-        //         },
-        //         child: Icon(Icons.notification_add,color: AppColors.textwhite,)
-        //     ),
-        //   ), // Ensure Scaffold is in context
-        // ),
+          )
 
 
-      ],
+        ],
+      ),
     );
   }
 
@@ -360,9 +445,9 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
         Container(
           height: 80.sp,
           decoration: BoxDecoration(
-            color: AppColors.primary,
+            color: AppColors.bgYellow,
             borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(10.sp),
+              bottom: Radius.circular(0.sp),
             ),
             // border: Border.all(
             //   color: Colors.purple.shade100, // Or any color you want
@@ -390,7 +475,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
             //   hideNavBarOnScroll: true,
             //   scrollControllers: _scrollControllers,
             // ),
-            padding: const EdgeInsets.only(top: 8),
+            padding:  EdgeInsets.only(top: 10.sp,bottom: 10.sp),
             onWillPop: (final context) async {
               await  showDialog<bool>(
                 context: context ?? this.context,
@@ -421,7 +506,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
             selectedTabScreenContext: (final context) {
               testContext = context;
             },
-            backgroundColor:AppColors.primary,
+            backgroundColor:AppColors.bgYellow,
             isVisible: !_hideNavBar,
             animationSettings: const NavBarAnimationSettings(
               navBarItemAnimation: ItemAnimationSettings(
@@ -442,7 +527,8 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
               ),
             ),
             confineToSafeArea: true,
-            navBarHeight: kBottomNavigationBarHeight,
+            // navBarHeight: kBottomNavigationBarHeight,
+            navBarHeight: 55.sp,
             navBarStyle: _navBarStyle,
           ),
         ),
