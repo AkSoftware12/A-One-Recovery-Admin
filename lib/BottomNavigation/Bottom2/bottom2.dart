@@ -153,7 +153,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     ),
     PersistentBottomNavBarItem(
       icon: FaIcon(FontAwesomeIcons.tasks,size: 16.sp,),
-      title: "Tasks",
+      title: "Allotment",
       textStyle:GoogleFonts.poppins(
         textStyle: Theme.of(context).textTheme.displayLarge,
         fontSize: TextSizes.text12,
@@ -169,8 +169,8 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
       inactiveColorPrimary: HexColor('#cbd5e0'),
     ),
     PersistentBottomNavBarItem(
-      icon: FaIcon(FontAwesomeIcons.rupeeSign,size: 16.sp,),
-      title: "Salary",
+      icon: FaIcon(FontAwesomeIcons.moneyBill1Wave,size: 16.sp,),
+      title: "Payroll",
       textStyle:GoogleFonts.poppins(
         textStyle: Theme.of(context).textTheme.displayLarge,
         fontSize: TextSizes.text12,
@@ -183,8 +183,8 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
       activeColorSecondary: _getSecondaryItemColorForSpecificStyles(),
     ),
     PersistentBottomNavBarItem(
-      icon: FaIcon(FontAwesomeIcons.calendarCheck,size: 16.sp,),
-      title: "Attendance",
+      icon: FaIcon(FontAwesomeIcons.fileInvoiceDollar,size: 16.sp,),
+      title: "Expenses",
       textStyle:GoogleFonts.poppins(
         textStyle: Theme.of(context).textTheme.displayLarge,
         fontSize: TextSizes.text12,

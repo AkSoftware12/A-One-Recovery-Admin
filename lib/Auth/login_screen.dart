@@ -8,8 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import '../BottomNavigation/Bottom2/bottom2.dart';
-import '../BottomNavigation/bottomnavigation.dart';
-import '../HexColorCode/HexColor.dart';
 import '../../strings.dart';
 import '../constants.dart';
 import '../textSize.dart';

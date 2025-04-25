@@ -1,19 +1,15 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-
-import '../../BottomNavigation/Bottom2/screens.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
-
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,10 +19,59 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
+  List<Map<String, dynamic>> items = [
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.fileInvoiceDollar,
+        size: 16.sp,
+        color: AppColors.bgYellow,
+      ),
+      "title": "Total EMIs",
+      "subtitle": "3.2%",
+      "amount": "142",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.users,
+        size: 16.sp,
+        color: AppColors.bgYellow,
+      ),
+      "title": "Agents",
+      "subtitle": "Active",
+      "amount": "12",
+      "icon2": FaIcon(
+        FontAwesomeIcons.userPlus,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.chartBar,
+        size: 16.sp,
+        color: AppColors.bgYellow,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "68%",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('dd-MMM-yyyy').format(now);
+    print(formattedDate); // e.g., 2025-04-25
     return Scaffold(
       body: Stack(
         children: [
@@ -38,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  AppColors.topBg, // top
+                  AppColors.bottomBg, // top
                   AppColors.bottomBg, // middle
                 ],
               ),
@@ -49,181 +94,515 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                // 1st card Start Welcome and total,agent recovery
                 Padding(
-                  padding: EdgeInsets.all(TextSizes.padding5),
+                  padding: EdgeInsets.all(TextSizes.padding11),
                   child: SizedBox(
                     width: double.infinity,
                     child: Card(
                       color: HexColor('#fefefe'),
                       child: Padding(
-                        padding: EdgeInsets.all(10.sp),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.all(0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Welcome, Admin!',
-                                        style: GoogleFonts.poppins(
-                                          textStyle: Theme.of(context).textTheme.displayLarge,
-                                          fontSize: MediaQuery.of(context).size.width * 0.045,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.textblack,
+                          padding: EdgeInsets.all(10.sp),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Welcome, Admin!',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.045,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.textblack,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(height: 5.sp),
-                                      Text(
-                                        AppStrings.recovery,
-                                        style: GoogleFonts.poppins(
-                                          textStyle: Theme.of(context).textTheme.displayLarge,
-                                          fontSize: MediaQuery.of(context).size.width * 0.03,
-                                          color: AppColors.subTitleBlack,
+                                        SizedBox(height: 5.sp),
+                                        Text(
+                                          AppStrings.recovery,
+                                          style: GoogleFonts.poppins(
+                                            textStyle: Theme.of(context)
+                                                .textTheme
+                                                .displayLarge,
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.035,
+                                            color: AppColors.subTitleBlack,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    children: [
-                                      Container(
-                                        height: 25.sp,
-                                        decoration: BoxDecoration(
-                                            color: AppColors.bottomBg,
-                                            borderRadius: BorderRadius.circular(5.sp)),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(horizontal: 5.sp),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.calendar_month,
-                                                size: 15.sp,
-                                                color: AppColors.bgYellow,
-                                              ),
-                                              SizedBox(width: 5.sp),
-                                              Text(
-                                                '23 Apr 2025',
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: TextSizes.text12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: AppColors.textBlack,
+                                      ],
+                                    ),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 25.sp,
+                                          decoration: BoxDecoration(
+                                              color: AppColors.bottomBg,
+                                              borderRadius:
+                                                  BorderRadius.circular(5.sp)),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5.sp),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_month,
+                                                  size: 15.sp,
+                                                  color: AppColors.bgYellow,
                                                 ),
+                                                SizedBox(width: 5.sp),
+                                                Text(
+                                                  formattedDate,
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: TextSizes.text12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors.textBlack,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: TextSizes.padding11),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              SizedBox(height: 10.sp),
+
+                              // 👉 GridView here
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.12,
+                                // or use Expanded if inside a flexible layout
+                                child: GridView.builder(
+                                  itemCount: items.length, // number of items
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3, // 2 columns
+                                    mainAxisSpacing: 10,
+                                    crossAxisSpacing: 10,
+                                    childAspectRatio: 1.2, // adjust as needed
+                                  ),
+                                  padding: const EdgeInsets.all(0),
+                                  itemBuilder: (context, index) {
+                                    final item = items[index];
+
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        color: AppColors.bottomBg,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  item["icon"],
+                                                  SizedBox(
+                                                    width: 5.sp,
+                                                  ),
+                                                  Text(
+                                                    items[index]['title']
+                                                            .toString() ??
+                                                        'Total EMIs',
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle:
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .displayLarge,
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal,
+                                                      color: AppColors
+                                                          .textblack,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8.sp),
+                                              Text(
+                                                items[index]['amount']
+                                                        .toString() ??
+                                                    '0.0',
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: Theme.of(context)
+                                                      .textTheme
+                                                      .displayLarge,
+                                                  fontSize: TextSizes.text20,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontStyle: FontStyle.normal,
+                                                  color: AppColors.textblack,
+                                                ),
+                                              ),
+                                              SizedBox(height: 8.sp),
+                                              Row(
+                                                children: [
+                                                  item["icon2"],
+                                                  SizedBox(
+                                                    width: 5.sp,
+                                                  ),
+                                                  Text(
+                                                    items[index]['subtitle']
+                                                            .toString() ??
+                                                        '0.0',
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle:
+                                                          Theme.of(context)
+                                                              .textTheme
+                                                              .displayLarge,
+                                                      fontSize:
+                                                          TextSizes.text13,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal,
+                                                      color: Colors.green,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: TextSizes.padding11),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                             SizedBox(height: 10.sp),
-
-                            // 👉 GridView here
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.15, // or use Expanded if inside a flexible layout
-                              child: GridView.builder(
-                                itemCount: 3, // number of items
-                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3, // 2 columns
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10,
-                                  childAspectRatio: 1, // adjust as needed
+                                    );
+                                  },
                                 ),
-                                padding: const EdgeInsets.all(0),
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    decoration: BoxDecoration(
-                                      color: AppColors.bottomBg,
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Center(
-                                      child:Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                Icon(FontAwesomeIcons.recordVinyl,color: AppColors.bgYellow,size: 11.sp,),
-                                                SizedBox(width: 5.sp,),
-                                                Text(
-                                                  'Total EMIs',
-                                                  style: GoogleFonts.poppins(
-                                                    textStyle: Theme.of(context).textTheme.displayLarge,
-                                                    fontSize: 11.sp,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontStyle: FontStyle.normal,
-                                                    color: AppColors.subTitleBlack,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-
-
-                                            SizedBox(height: 8.sp),
-                                            Text(
-                                              '2535',
-                                              style: GoogleFonts.poppins(
-                                                textStyle: Theme.of(context).textTheme.displayLarge,
-                                                fontSize: TextSizes.text20,
-                                                fontWeight: FontWeight.w700,
-                                                fontStyle: FontStyle.normal,
-                                                color: AppColors.textblack,
-                                              ),
-                                            ),
-                                            SizedBox(height: 8.sp),
-                                            Row(
-                                              children: [
-                                                Icon(FontAwesomeIcons.arrowUp,color: Colors.green,size: 11.sp,),
-                                                SizedBox(width: 5.sp,),
-                                                Text(
-                                                  '3.2%',
-                                                  style: GoogleFonts.poppins(
-                                                    textStyle: Theme.of(context).textTheme.displayLarge,
-                                                    fontSize: TextSizes.text11,
-                                                    fontWeight: FontWeight.w500,
-                                                    fontStyle: FontStyle.normal,
-                                                    color: Colors.green,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-
-                                    ),
-                                  );
-                                },
                               ),
-                            ),
-                          ],
-                        )
-
-                      ),
+                            ],
+                          )),
                     ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                const ClientListSection(),
-                const BottomCard(),
+
+                // 1st card Close
 
 
+                // Quick Access Start
+
+                Padding(
+                  padding:  EdgeInsets.only(left: TextSizes.padding20,right: TextSizes.padding20),
+                  child: const BottomCard(),
+                ),
+
+                // Quick Access Close
 
 
+                Padding(
+                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15),
+                  child: Card(
+                    color: AppColors.textWhite,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Padding(
+                      padding:  EdgeInsets.all(TextSizes.padding20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                               Text(
+                                'Recovery Progress',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text15,
+                                  fontWeight: FontWeight.w800,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.textblack,
+                                ),
+                              ),
+                              // TextButton(
+                              //   onPressed: () {},
+                              //   child:  Text('View All', style: GoogleFonts.poppins(
+                              //     textStyle: Theme.of(context).textTheme.displayLarge,
+                              //     fontSize: TextSizes.text15,
+                              //     fontWeight: FontWeight.w800,
+                              //     fontStyle: FontStyle.normal,
+                              //     color: AppColors.textblack,
+                              //   ),),
+                              // ),
+                            ],
+                          ),
+                           SizedBox(height: 18.sp),
+                          // Monthly Target
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children:  [
+                              Text(
+                                'Monthly Target',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text13,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.subTitleBlack,
+                                ),
+                              ),
+                              Text(
+                                '₹8.5L / ₹12L',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text13,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.subTitleBlack,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          // Progress Bar
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: LinearProgressIndicator(
+                              value: 0.70,
+                              backgroundColor: Colors.grey.shade300,
+                              color: AppColors.bgYellow,
+                              minHeight: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          // Completed & Days Left
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children:  [
+                              Text('70% Completed',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text13,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.subTitleBlack,
+                                ),),
+                              Text('15 days left',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text13,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.subTitleBlack,
+                                ),),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          // Line Chart
+                          SizedBox(
+                            height: 230.sp,
+                            child: LineChart(
+                              LineChartData(
+                                gridData: FlGridData(
+                                  show: true,
+                                  drawVerticalLine: true,
+                                  horizontalInterval: 100000,
+                                  getDrawingHorizontalLine: (value) {
+                                    return FlLine(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      strokeWidth: 1,
+                                    );
+                                  },
+                                  getDrawingVerticalLine: (value) {
+                                    return FlLine(
+                                      color: Colors.grey.withOpacity(0.1),
+                                      strokeWidth: 1,
+                                    );
+                                  },
+                                ),
+                                titlesData: FlTitlesData(
+                                  leftTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      interval: 100000,
+                                      reservedSize: 50,
+                                      getTitlesWidget: (value, meta) {
+                                        return Text(
+                                          '₹${(value / 1000).toStringAsFixed(0)}K',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: TextSizes.text9,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.subTitleBlack,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  bottomTitles: AxisTitles(
+                                    sideTitles: SideTitles(
+                                      showTitles: true,
+                                      reservedSize: 30,
+                                      getTitlesWidget: (value, meta) {
+                                        const months = [
+                                          'Jan',
+                                          'Feb',
+                                          'Mar',
+                                          'Apr',
+                                          'May',
+                                          'Jun',
+                                          'Jul'
+                                        ];
+                                        return Padding(
+                                          padding: const EdgeInsets.only(top: 8),
+                                          child: Text(
+                                            months[value.toInt()],
+                                            style: GoogleFonts.poppins(
+                                              fontSize: TextSizes.text11,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.subTitleBlack,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                ),
+                                borderData: FlBorderData(
+                                  show: true,
+                                  border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+                                ),
+                                minX: 0,
+                                maxX: 6,
+                                minY: 0,
+                                maxY: 600000,
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots: [
+                                      FlSpot(0, 300000),
+                                      FlSpot(1, 320000),
+                                      FlSpot(2, 450000),
+                                      FlSpot(3, 370000),
+                                      FlSpot(4, 420000),
+                                      FlSpot(5, 500000),
+                                      FlSpot(6, 560000),
+                                    ],
+                                    isCurved: true,
+                                    color: AppColors.bgYellow,
+                                    barWidth: 4,
+                                    isStrokeCapRound: true,
+                                    belowBarData: BarAreaData(
+                                      show: true,
+                                      color: AppColors.bgYellow.withOpacity(0.15),
+                                    ),
+                                    dotData: FlDotData(
+                                      show: true,
+                                      getDotPainter: (spot, percent, barData, index) =>
+                                          FlDotCirclePainter(
+                                            radius: 4,
+                                            color: AppColors.bgYellow,
+                                            strokeWidth: 2,
+                                            strokeColor: Colors.white,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15),
+                  child: Card(
+                    color: AppColors.textWhite,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 4,
+                    child: Padding(
+                      padding:  EdgeInsets.all(TextSizes.padding11),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title Row
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Top Performing Employee',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text15,
+                                  fontWeight: FontWeight.w800,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.textblack,
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child:  Text('View All', style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text15,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: AppColors.bgYellow,
+                                ),),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10.sp),
+                          // Monthly Target
+                          ListView.builder(
+                              itemCount: 3,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              padding: EdgeInsets.all(0),
+                              itemBuilder: (context, index) {
+                                return ClientCard(
+                                  name: "Vikram Singh",
+                                  bank: "H92% Recovery Rate",
+                                  location: "Rohini, Delhi",
+                                  time: "10:30 AM",
+                                  days: "2 Month",
+                                  amount: "₹24,500",
+                                  color: Colors.purple,
+                                );
+                              }),
 
 
+                          // Progress Bar
+
+                          // Line Chart
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
 
                 SizedBox(
                   height: 80.sp,
@@ -239,8 +618,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class EmiSummarySection extends StatelessWidget {
   const EmiSummarySection({super.key});
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -351,7 +728,7 @@ class SummaryCard extends StatelessWidget {
                     value,
                     style: GoogleFonts.poppins(
                       textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: MediaQuery.of(context).size.width*0.01,
+                      fontSize: MediaQuery.of(context).size.width * 0.01,
                       fontWeight: FontWeight.w700,
                       fontStyle: FontStyle.normal,
                       color: AppColors.textblack,
@@ -372,7 +749,7 @@ class SummaryCard extends StatelessWidget {
                         subValue,
                         style: GoogleFonts.poppins(
                           textStyle: Theme.of(context).textTheme.displayLarge,
-                          fontSize: MediaQuery.of(context).size.width*0.01,
+                          fontSize: MediaQuery.of(context).size.width * 0.01,
                           fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: AppColors.subTitleBlack,
@@ -382,7 +759,6 @@ class SummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-
               img
             ],
           ),
@@ -392,114 +768,138 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-class ClientListSection extends StatelessWidget {
-  const ClientListSection({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: EdgeInsets.only(
-              left: TextSizes.padding15, right: TextSizes.padding5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.insert_chart,
-                    color: AppColors.bgYellow,
-                    size: 18.sp,
-                  ),
-                  SizedBox(
-                    width: 5.sp,
-                  ),
-                  Text(
-                    'Recent client list',
-                    style: GoogleFonts.poppins(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: TextSizes.text15,
-                      fontWeight: FontWeight.w700,
-                      fontStyle: FontStyle.normal,
-                      color: AppColors.textblack,
-                    ),
-                  ),
-                ],
-              ),
-              TextButton(
-                  onPressed: () {
-                    print('click');
-                  },
-                  child: Text(
-                    "View All",
-                    style: GoogleFonts.poppins(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: TextSizes.text15,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.normal,
-                      color: AppColors.bgYellow,
-                    ),
-                  )),
-            ],
-          ),
-        ),
-        ListView.builder(
-            itemCount: 2,
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.all(0),
-            itemBuilder: (context, index) {
-              return ClientCard(
-                name: "Vikram Singh",
-                bank: "HDFC Bank - Personal Loan",
-                location: "Rohini, Delhi",
-                time: "10:30 AM",
-                days: "2 Month",
-                amount: "₹24,500",
-              );
-            }),
-      ],
-    );
-  }
-}
-
-class BottomCard  extends StatelessWidget {
+class BottomCard extends StatefulWidget {
   const BottomCard({super.key});
 
   @override
+  State<BottomCard> createState() => _BottomCardState();
+}
+
+class _BottomCardState extends State<BottomCard> {
+  List<Map<String, dynamic>> items = [
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.userPlus,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Total EMIs",
+      "subtitle": "3.2%",
+      "amount": "Add Employee",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: AppColors.textWhite,
+      ),
+      "color":HexColor('#3b82f6')
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.fileInvoiceDollar,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Agents",
+      "subtitle": "Active",
+      "amount": "Add Expenses",
+      "icon2": FaIcon(
+        FontAwesomeIcons.userPlus,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#22c55e')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.fileInvoiceDollar,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "Allowance",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#eab308')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.moneyBill1Wave,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Total EMIs",
+      "subtitle": "3.2%",
+      "amount": "Create Salary",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#ef4444')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.minusCircle,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Agents",
+      "subtitle": "Active",
+      "amount": "Deduction",
+      "icon2": FaIcon(
+        FontAwesomeIcons.userPlus,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#6366f1')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.wallet,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "Manage Fund",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#6366f1')
+
+    },
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    double collectionsProgress = 7.5/ 9.5;
-    double collectionsTargetAchieved = 7.5;
-    double collectionsTargetTotal = 9.5;
-    double emiResolutionRate = 50; // in percentage
     return Column(
       children: [
-        SizedBox(
-          height: 10.sp,
-        ),
+
         Padding(
           padding: EdgeInsets.only(
-              left: TextSizes.padding15, right: TextSizes.padding5),
+              left: TextSizes.padding5, right: TextSizes.padding5,bottom: 10.sp),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(
-                    Icons.insert_chart,
-                    color: AppColors.bgYellow,
-                    size: 18.sp,
-                  ),
-                  SizedBox(
-                    width: 5.sp,
-                  ),
                   Text(
-                    'Performance Summary',
+                    'Quick Access',
                     style: GoogleFonts.poppins(
                       textStyle: Theme.of(context).textTheme.displayLarge,
                       fontSize: TextSizes.text15,
-                      fontWeight: FontWeight.w700,
+                      fontWeight: FontWeight.w800,
                       fontStyle: FontStyle.normal,
                       color: AppColors.textblack,
                     ),
@@ -510,155 +910,77 @@ class BottomCard  extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 10.sp,
+          height: 2.sp,
         ),
-        Padding(
-          padding: EdgeInsets.only(
-              left: TextSizes.padding15, right: TextSizes.padding5),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-                color: AppColors.textWhite,
-                borderRadius: BorderRadius.circular(10)
+        SizedBox(
+          height: MediaQuery.of(context).size.height * 0.3,
+          // or use Expanded if inside a flexible layout
+          child: GridView.builder(
+            itemCount: items.length, // number of items
+            physics: NeverScrollableScrollPhysics(),
+            gridDelegate:
+            const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 2 columns
+              mainAxisSpacing: 15,
+              crossAxisSpacing: 15,
+              childAspectRatio: 1, // adjust as needed
             ),
-            child: Column(
+            padding: const EdgeInsets.all(0),
+            itemBuilder: (context, index) {
+              final item = items[index];
 
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              return Container(
+                decoration: BoxDecoration(
+                  color: AppColors.textWhite,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 45.sp,  // size
+                          height: 45.sp,
+                          decoration: BoxDecoration(
+                            color: item['color'],
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: item["icon"],
 
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: SummaryBottomCard(
-                          title: "Recovery Rate",
-                          value: "86%",
-                          subValue: "+ 2.5%",
-                          icon: FaIcon(FontAwesomeIcons.arrowUp,size: 12.sp,color: Colors.green,),
-                          color: Colors.green,
+                          ),
+                        ),
+                        SizedBox(height: 8.sp),
+                        Center(
+                          child: Text(
+                            items[index]['amount']
+                                .toString() ??
+                                '0.0',
+                            style: GoogleFonts.poppins(
+                              textStyle: Theme.of(context)
+                                  .textTheme
+                                  .displayLarge,
+                              fontSize: TextSizes.text12,
+                              fontWeight: FontWeight.w600,
+                              fontStyle: FontStyle.normal,
+                              color: AppColors.textblack,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
 
                         ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: SummaryBottomCard(
-                          title: "Monthly Target",
-                          value: "92%",
-                          subValue: "On Track",
-                          icon: FaIcon(FontAwesomeIcons.arrowUp,size: 12.sp,color: Colors.green,),
-                          color: Colors.green,
-
-                        ),
-                      ),
-                    ],
+                        SizedBox(height: 8.sp),
+                      ],
+                    ),
                   ),
                 ),
-                Padding(
-                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Collections Target",
-                            style: GoogleFonts.poppins(
-                              textStyle: Theme.of(context).textTheme.displayLarge,
-                              fontSize: TextSizes.text15,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.subTitleBlack,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "${collectionsTargetAchieved}L of ${collectionsTargetTotal}L",
-                              style: GoogleFonts.poppins(
-                                textStyle: Theme.of(context).textTheme.displayLarge,
-                                fontSize: TextSizes.text15,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.normal,
-                                color: AppColors.subTitleBlack,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: LinearProgressIndicator(
-                          value: collectionsTargetAchieved / collectionsTargetTotal,
-                          color: Colors.orange,
-                          backgroundColor: AppColors.subTitleBlack,
-                          minHeight: 8,
-                        ),
-                      ),
-
-
-
-                      SizedBox(height: 20.sp),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "EMI Resolution Rate",
-                            style: GoogleFonts.poppins(
-                              textStyle: Theme.of(context).textTheme.displayLarge,
-                              fontSize: TextSizes.text15,
-                              fontWeight: FontWeight.w500,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.subTitleBlack,
-                            ),
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              "${emiResolutionRate.toStringAsFixed(0)}%",
-                              style: GoogleFonts.poppins(
-                                textStyle: Theme.of(context).textTheme.displayLarge,
-                                fontSize: TextSizes.text15,
-                                fontWeight: FontWeight.w500,
-                                fontStyle: FontStyle.normal,
-                                color: AppColors.subTitleBlack,
-                              ),
-                            ),
-                          ),
-
-                        ],
-                      ),
-                      SizedBox(height: 5.sp),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-
-                        child: LinearProgressIndicator(
-                          value: emiResolutionRate / 100,
-                          color: Colors.orange,
-                          backgroundColor: AppColors.subTitleBlack,
-                          minHeight: 8,
-                        ),
-                      ),
-
-                      SizedBox(height: 15.sp),
-
-                    ],
-                  ),
-                )
-              ],
-
-
-
-
-            ),
-
-
+              );
+            },
           ),
-        )
+        ),
 
       ],
     );
@@ -696,7 +1018,6 @@ class SummaryBottomCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-
                   Text(
                     title,
                     style: GoogleFonts.poppins(
@@ -722,7 +1043,9 @@ class SummaryBottomCard extends StatelessWidget {
                   Row(
                     children: [
                       icon,
-                      SizedBox(width: 5.sp,),
+                      SizedBox(
+                        width: 5.sp,
+                      ),
                       Text(
                         subValue,
                         style: GoogleFonts.poppins(
@@ -737,7 +1060,6 @@ class SummaryBottomCard extends StatelessWidget {
                   ),
                 ],
               ),
-
             ],
           ),
         ),
@@ -746,7 +1068,6 @@ class SummaryBottomCard extends StatelessWidget {
   }
 }
 
-
 class ClientCard extends StatelessWidget {
   final String name;
   final String bank;
@@ -754,6 +1075,7 @@ class ClientCard extends StatelessWidget {
   final String time;
   final String days;
   final String amount;
+  final Color color;
 
   const ClientCard({
     super.key,
@@ -762,218 +1084,102 @@ class ClientCard extends StatelessWidget {
     required this.location,
     required this.time,
     required this.days,
-    required this.amount,
+    required this.amount, required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: HexColor('#fefefe'),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                SvgPicture.asset(
-                  'assets/excla.svg',
-                  height: 25.sp,
-                  width: 25.sp,
+    String initials = '';
+    if (name.isNotEmpty) initials += name[0];
+    // if (lastName.isNotEmpty) initials += lastName[0];
+    return  Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                height: 40.sp, // or 25.sp if using flutter_screenutil
+                width: 40.sp,
+                decoration: BoxDecoration(
+                  color: color, // background color
+                  shape: BoxShape.circle,
                 ),
-                SizedBox(
-                  width: 5.sp,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      style: GoogleFonts.poppins(
-                        textStyle: Theme.of(context).textTheme.displayLarge,
-                        fontSize: TextSizes.text14,
-                        fontWeight: FontWeight.w700,
-                        fontStyle: FontStyle.normal,
-                        color: AppColors.textblack,
-                      ),
-                    ),
-                    Text(
-                      bank,
-                      style: GoogleFonts.poppins(
-                        textStyle: Theme.of(context).textTheme.displayLarge,
-                        fontSize: TextSizes.text12,
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
-                        color: AppColors.subTitleBlack,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(
-              height: 10.sp,
-            ),
-            Row(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(5.sp)),
-                  child: Padding(
-                    padding: EdgeInsets.all(4.sp),
-                    child: Row(
-                      children: [
-                        Icon(Icons.location_on,
-                            size: TextSizes.padding15,
-                            color: AppColors.bgYellow),
-                        const SizedBox(width: 4),
-                        Text(
-                          location,
-                          style: GoogleFonts.poppins(
-                            textStyle: Theme.of(context).textTheme.displayLarge,
-                            fontSize: TextSizes.text12,
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.normal,
-                            color: AppColors.subTitleBlack,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(4.sp),
-                  child: Row(
-                    children: [
-                      Icon(Icons.calendar_month,
-                          size: TextSizes.padding15, color: AppColors.bgYellow),
-                      const SizedBox(width: 4),
-                      Text(
-                        '25/04/2025',
-                        style: GoogleFonts.poppins(
-                          textStyle: Theme.of(context).textTheme.displayLarge,
-                          fontSize: TextSizes.text12,
-                          fontWeight: FontWeight.w500,
-                          fontStyle: FontStyle.normal,
-                          color: AppColors.subTitleBlack,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(10.sp)),
-                  child: Padding(
-                    padding: EdgeInsets.all(5.sp),
-                    child: Row(
-                      children: [
-                        Text(
-                          days,
-                          style: GoogleFonts.poppins(
-                            textStyle: Theme.of(context).textTheme.displayLarge,
-                            fontSize: TextSizes.text11,
-                            fontWeight: FontWeight.w500,
-                            fontStyle: FontStyle.normal,
-                            color: AppColors.textWhite,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.sp),
-            Divider(
-              height: 1.sp,
-              color: Colors.grey,
-              thickness: 1.sp,
-            ),
-            SizedBox(height: 10.sp),
-            Row(
-              children: [
-                Text(
-                  amount,
+                alignment: Alignment.center,
+                child: Text(
+                  initials.toUpperCase(),
                   style: GoogleFonts.poppins(
                     textStyle: Theme.of(context).textTheme.displayLarge,
-                    fontSize: TextSizes.text18,
+                    fontSize: TextSizes.text16,
                     fontWeight: FontWeight.w700,
                     fontStyle: FontStyle.normal,
-                    color: AppColors.textblack,
+                    color: AppColors.textWhite,
                   ),
                 ),
-                const Spacer(),
-                Container(
-                  height: 30.sp,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.bgYellow, // background color of the circle
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.call,
-                      color: Colors.white,
-                      size: 15.sp,
+              ),
+              SizedBox(
+                width: 5.sp,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: TextSizes.text13,
+                      fontWeight: FontWeight.w700,
+                      fontStyle: FontStyle.normal,
+                      color: AppColors.textblack,
                     ),
-                    onPressed: () {
-                      // your onPressed logic here
-                    },
                   ),
+                  SizedBox(height: 3.sp,),
+                  Text(
+                    bank,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: TextSizes.text12,
+                      fontWeight: FontWeight.w500,
+                      fontStyle: FontStyle.normal,
+                      color: AppColors.subTitleBlack,
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                '₹3.2L',
+                style: GoogleFonts.poppins(
+                  textStyle: Theme.of(context).textTheme.displayLarge,
+                  fontSize: TextSizes.text13,
+                  fontWeight: FontWeight.w700,
+                  fontStyle: FontStyle.normal,
+                  color: AppColors.textblack,
                 ),
-                Container(
-                  height: 30.sp,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.green, // background color of the circle
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.map,
-                      color: Colors.white,
-                      size: 15.sp,
-                    ),
-                    onPressed: () {
-                      // your onPressed logic here
-                    },
-                  ),
+              ),
+              SizedBox(height: 3.sp,),
+              Text(
+                '+12% this month',
+                style: GoogleFonts.poppins(
+                  textStyle: Theme.of(context).textTheme.displayLarge,
+                  fontSize: TextSizes.text12,
+                  fontWeight: FontWeight.w500,
+                  fontStyle: FontStyle.normal,
+                  color: Colors.green,
                 ),
-                SizedBox(
-                  width: 5.sp,
-                ),
-                SizedBox(
-                  height: 30.sp,
-                  child: ElevatedButton(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                      HexColor('#fe9b07'), // set your desired color here
-                    ),
-                    child: Text(
-                      "Collect",
-                      style: GoogleFonts.poppins(
-                        textStyle: Theme.of(context).textTheme.displayLarge,
-                        fontSize: TextSizes.text13,
-                        fontWeight: FontWeight.w500,
-                        fontStyle: FontStyle.normal,
-                        color: AppColors.textWhite,
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          )
+
+        ],
       ),
     );
   }
 }
-
-
-
