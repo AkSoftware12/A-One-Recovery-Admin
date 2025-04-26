@@ -6,6 +6,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import '../../Employee/Add/add_employee1.dart';
+import '../../Employee/Add/demo.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../constants.dart';
 import '../../strings.dart';
@@ -538,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 Padding(
-                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15),
+                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15,top: TextSizes.padding15),
                   child: Card(
                     color: AppColors.textWhite,
                     shape: RoundedRectangleBorder(
@@ -929,51 +932,74 @@ class _BottomCardState extends State<BottomCard> {
             itemBuilder: (context, index) {
               final item = items[index];
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: AppColors.textWhite,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 45.sp,  // size
-                          height: 45.sp,
-                          decoration: BoxDecoration(
-                            color: item['color'],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Center(
-                            child: item["icon"],
+              return GestureDetector(
+                onTap: (){
 
-                          ),
-                        ),
-                        SizedBox(height: 8.sp),
-                        Center(
-                          child: Text(
-                            items[index]['amount']
-                                .toString() ??
-                                '0.0',
-                            style: GoogleFonts.poppins(
-                              textStyle: Theme.of(context)
-                                  .textTheme
-                                  .displayLarge,
-                              fontSize: TextSizes.text12,
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.textblack,
+                  if(item['amount']=='Add Employee'){
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: RegistrationPage(
+                        menuScreenContext: context,
+                      ),
+                    );
+                  } else if(item['amount']=='Add Expenses'){
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: AddEmployeePage1(
+                        menuScreenContext: context,
+                      ),
+                    );
+                  }
+
+
+
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.textWhite,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 45.sp,  // size
+                            height: 45.sp,
+                            decoration: BoxDecoration(
+                              color: item['color'],
+                              shape: BoxShape.circle,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
+                            child: Center(
+                              child: item["icon"],
 
-                        ),
-                        SizedBox(height: 8.sp),
-                      ],
+                            ),
+                          ),
+                          SizedBox(height: 8.sp),
+                          Center(
+                            child: Text(
+                              items[index]['amount']
+                                  .toString() ??
+                                  '0.0',
+                              style: GoogleFonts.poppins(
+                                textStyle: Theme.of(context)
+                                    .textTheme
+                                    .displayLarge,
+                                fontSize: TextSizes.text12,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+
+                          ),
+                          SizedBox(height: 8.sp),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1093,7 +1119,7 @@ class ClientCard extends StatelessWidget {
     if (name.isNotEmpty) initials += name[0];
     // if (lastName.isNotEmpty) initials += lastName[0];
     return  Padding(
-      padding: const EdgeInsets.all(3.0),
+      padding:  EdgeInsets.only(bottom: TextSizes.padding15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
