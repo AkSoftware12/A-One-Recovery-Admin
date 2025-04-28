@@ -1,39 +1,18 @@
+import 'dart:async';
+import 'package:aoneadmin/constants.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../../textSize.dart';
 
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       debugShowCheckedModeBanner: false,
-//       theme: ThemeData(
-//         primarySwatch: Colors.indigo,
-//         inputDecorationTheme: InputDecorationTheme(
-//           border: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(12),
-//           ),
-//           focusedBorder: OutlineInputBorder(
-//             borderRadius: BorderRadius.circular(12),
-//             borderSide: BorderSide(color: Colors.indigo, width: 2),
-//           ),
-//           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-//         ),
-//         elevatedButtonTheme: ElevatedButtonThemeData(
-//           style: ElevatedButton.styleFrom(
-//             shape: RoundedRectangleBorder(
-//               borderRadius: BorderRadius.circular(12),
-//             ),
-//             elevation: 2,
-//           ),
-//         ),
-//       ),
-//       home: RegistrationPage(),
-//     );
-//   }
-// }
+
 
 class RegistrationPage extends StatefulWidget {
   const RegistrationPage({super.key, required BuildContext menuScreenContext});
@@ -45,7 +24,7 @@ class RegistrationPage extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage> with SingleTickerProviderStateMixin {
   int _currentStep = 0;
   final _personalFormKey = GlobalKey<FormState>();
-  final _phoneFormKey = GlobalKey<FormState>();
+  final _bankFormKey = GlobalKey<FormState>();
   final _purposeFormKey = GlobalKey<FormState>();
   AnimationController? _animationController;
   Animation<double>? _animation;
@@ -61,16 +40,32 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
   final TextEditingController nameController = TextEditingController();
   final TextEditingController districtController = TextEditingController();
   final TextEditingController dobController = TextEditingController();
+  final TextEditingController joiningDateController = TextEditingController();
   final TextEditingController ifscController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController contactController = TextEditingController();
   final TextEditingController pinController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController stateController = TextEditingController();
-  final TextEditingController contactController = TextEditingController();
+  final TextEditingController branchNameController = TextEditingController();
+  final TextEditingController bankNameController = TextEditingController();
+  final TextEditingController bankCityController = TextEditingController();
+  final TextEditingController bankStateController = TextEditingController();
+  final TextEditingController bankAccountNoController = TextEditingController();
+  final TextEditingController basicPayController = TextEditingController();
+
+  List<Map<String, dynamic>> documents = [];
+  final TextEditingController _documentNameController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
   String? contractType;
   String? bloodGroup;
   String? gender;
+  String? religion;
+  String? employeetype;
+  String? socialCategory;
   double _opacity = 0.0;
+
+
   // Phone info
   final _phoneController = TextEditingController();
   String _selectedPhoneOption = "";
@@ -80,6 +75,9 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
   String _callingAction = "";
   String city = '';
   String stateName = '';
+
+  String? branch, bankCity, state, bank;
+  Timer? _debounce;
 
 
   @override
@@ -100,6 +98,13 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
         fetchCityState(pinController.text);
       }
     });
+
+    // ifscController.addListener(() {
+    //   if (ifscController.text.length == 11) {
+    //     _onIFSCChanged(ifscController.text);
+    //   }
+    // });
+
 
   }
 
@@ -130,6 +135,79 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
       });
     }
   }
+
+  // Fetch bank details from API
+  Future<void> getDetails(String ifscCode) async {
+    final url = Uri.parse('https://ifsc.razorpay.com/$ifscCode');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      setState(() {
+        branchNameController.text = data['BRANCH'];
+        bankCityController.text  = data['CITY'];
+        bankStateController.text = data['STATE'];
+        bankNameController.text  = data['BANK'];
+      });
+    } else {
+      setState(() {
+        branch = bankCity = state = bank = null;
+        branchNameController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+        bankStateController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+        bankCityController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+        bankNameController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid IFSC Code")),
+      );
+    }
+  }
+
+  // Debounce textfield changes
+  void _onIFSCChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(Duration(milliseconds: 600), () {
+      if (value.length == 11) {
+        getDetails(value);
+      } else {
+        setState(() {
+          branch = bankCity = state = bank = null;
+          branchNameController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+          bankStateController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+          bankCityController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+          bankNameController.clear();  // <-- ye line add karo agar textfield bhi empty karni ho
+
+        });
+      }
+    });
+  }
+
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        documents.add({
+          'name': _documentNameController.text,
+          'image': pickedFile.path,
+        });
+      });
+      _documentNameController.clear();  // Clear the name field after adding the document
+    }
+  }
+
+  // Function to add document
+  void _addDocument() {
+    if (_documentNameController.text.isNotEmpty) {
+      _pickImage();
+    } else {
+      // Show warning if document name is empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a document name')),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _animationController?.dispose();
@@ -138,6 +216,9 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
     _emailController.dispose();
     _passwordController.dispose();
     _phoneController.dispose();
+
+    ifscController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -228,21 +309,21 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
                           color: _currentStep > 0 ? Colors.indigo : Colors.grey.shade300,
                         ),
                       ),
-                      _buildProgressIndicator(1, "Phone"),
+                      _buildProgressIndicator(1, "Bank Details"),
                       Expanded(
                         child: Container(
                           height: 3,
                           color: _currentStep > 1 ? Colors.indigo : Colors.grey.shade300,
                         ),
                       ),
-                      _buildProgressIndicator(2, "Purpose"),
+                      _buildProgressIndicator(2, "Document"),
                       Expanded(
                         child: Container(
                           height: 3,
-                          color: _currentStep > 1 ? Colors.indigo : Colors.grey.shade300,
+                          color: _currentStep > 2 ? Colors.indigo : Colors.grey.shade300,
                         ),
                       ),
-                      _buildProgressIndicator(3, "Bank"),
+                      _buildProgressIndicator(3, "Other"),
 
                     ],
                   ),
@@ -319,9 +400,11 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
       case 0:
         return _buildPersonalInfoStep();
       case 1:
-        return _buildPhoneVerificationStep();
+        return _buildBankInfoStep();
       case 2:
-        return _buildPurposeStep();
+        return _buildDocumentsStep();
+      case 3:
+        return _buildOtherStep();
       default:
         return Container();
     }
@@ -339,7 +422,7 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildSectionTitle("Personal Information"),
-            SizedBox(height: 16),
+            SizedBox(height: 0),
 
             buildLabel("Name", fontSize),
             buildTextField(
@@ -347,9 +430,68 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
               controller: nameController,
               fontSize: fontSize,
               icon: Icons.person_outline,
+              keyboardType: TextInputType.name
             ),
 
 
+
+
+
+            buildLabel("Email", fontSize),
+            buildTextField(
+              hint: "Enter Email",
+              controller: emailController,
+              fontSize: fontSize,
+              icon: Icons.email_outlined,
+              keyboardType: TextInputType.emailAddress,
+            ),
+
+            buildLabel("Contact", fontSize),
+            buildTextFieldContactNumber(
+              hint: "Enter Contact Number",
+              controller: contactController,
+              fontSize: fontSize,
+              icon: Icons.call,
+              keyboardType: TextInputType.number,
+            ),
+
+
+            buildLabel("PIN", fontSize),
+            buildTextFieldPinCode(
+              hint: "Enter PIN",
+              controller: pinController,
+              fontSize: fontSize,
+              icon: Icons.lock_outline,
+              keyboardType: TextInputType.number,
+            ),
+
+            buildLabel("Address", fontSize),
+            buildTextField(
+              hint: "Enter Address",
+              controller: addressController,
+              fontSize: fontSize,
+              icon: Icons.book,
+              keyboardType: TextInputType.streetAddress,
+            ),
+
+
+
+            buildLabel("District", fontSize),
+            buildTextField(
+              hint: "Enter District",
+              controller: districtController,
+              fontSize: fontSize,
+              icon: Icons.location_city,
+            ),
+
+            buildLabel("State", fontSize),
+
+            buildTextField(
+              hint: "Enter State",
+              controller: stateController,
+              fontSize: fontSize,
+              icon: Icons.language,
+            ),
 
             buildLabel("Date of Birth", fontSize),
             TextFormField(
@@ -390,31 +532,6 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
               validator: (value) => value!.isEmpty ? "Required field" : null,
             ),
 
-            buildLabel("IFSC Code", fontSize),
-            buildTextField(
-              hint: "Enter IFSC Code",
-              controller: ifscController,
-              fontSize: fontSize,
-              icon: Icons.account_balance,
-            ),
-
-            buildLabel("Contract Type", fontSize),
-            buildDropdown(
-              items: ["Permanent", "Contract"],
-              onChanged: (value) => setState(() => contractType = value),
-              value: contractType,
-              fontSize: fontSize,
-              icon: Icons.work_outline,
-            ),
-
-            buildLabel("Blood Group", fontSize),
-            buildDropdown(
-              items: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
-              onChanged: (value) => setState(() => bloodGroup = value),
-              value: bloodGroup,
-              fontSize: fontSize,
-              icon: Icons.bloodtype_outlined,
-            ),
 
             buildLabel("Gender", fontSize),
             buildDropdown(
@@ -424,116 +541,40 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
               fontSize: fontSize,
               icon: Icons.person,
             ),
-
-            buildLabel("Email", fontSize),
-            buildTextField(
-              hint: "Enter Email",
-              controller: emailController,
-              fontSize: fontSize,
-              icon: Icons.email_outlined,
-              keyboardType: TextInputType.emailAddress,
-            ),
-
-            buildLabel("PIN", fontSize),
-            buildTextField(
-              hint: "Enter PIN",
-              controller: pinController,
-              fontSize: fontSize,
-              icon: Icons.lock_outline,
-              keyboardType: TextInputType.number,
-            ),
-
-            buildLabel("Address", fontSize),
-            buildTextField(
-              hint: "Enter Address",
-              controller: addressController,
-              fontSize: fontSize,
-              icon: Icons.book,
-              keyboardType: TextInputType.streetAddress,
-            ),
-
-
-
-            buildLabel("District", fontSize),
-            buildTextField(
-              hint: "Enter District",
-              controller: districtController,
-              fontSize: fontSize,
-              icon: Icons.location_city,
-            ),
-
-            buildLabel("State", fontSize),
-
-            buildTextField(
-              hint: "Enter State",
-              controller: stateController,
-              fontSize: fontSize,
-              icon: Icons.language,
-            ),
-
-            // TextFormField(
-            //   controller: _firstNameController,
-            //   decoration: InputDecoration(
-            //     labelText: "First Name",
-            //     prefixIcon: Icon(Icons.person_outline),
-            //   ),
-            //   validator: (value) => value!.isEmpty ? "Required field" : null,
-            // ),
-            // SizedBox(height: 20),
-            // TextFormField(
-            //   controller: _lastNameController,
-            //   decoration: InputDecoration(
-            //     labelText: "Last Name",
-            //     prefixIcon: Icon(Icons.person_outline),
-            //   ),
-            //   validator: (value) => value!.isEmpty ? "Required field" : null,
-            // ),
-            // SizedBox(height: 20),
-            // TextFormField(
-            //   controller: _emailController,
-            //   decoration: InputDecoration(
-            //     labelText: "Your email",
-            //     prefixIcon: Icon(Icons.email_outlined),
-            //   ),
-            //   validator: (value) => value!.isEmpty || !value.contains('@')
-            //       ? "Enter a valid email" : null,
-            // ),
-            // SizedBox(height: 20),
-            // TextFormField(
-            //   controller: _passwordController,
-            //   obscureText: true,
-            //   decoration: InputDecoration(
-            //     labelText: "Password",
-            //     prefixIcon: Icon(Icons.lock_outline),
-            //   ),
-            //   validator: (value) => value!.length < 6
-            //       ? "Password must be at least 6 characters" : null,
-            // ),
-            // SizedBox(height: 20),
-            // DropdownButtonFormField<String>(
-            //   value: _selectedCountry,
-            //   decoration: InputDecoration(
-            //     labelText: "Country",
-            //     prefixIcon: Icon(Icons.public),
-            //   ),
-            //   items: ["United States", "Canada", "United Kingdom", "Australia"]
-            //       .map((country) => DropdownMenuItem(
-            //     value: country,
-            //     child: Text(country),
-            //   ))
-            //       .toList(),
-            //   onChanged: (value) {
-            //     setState(() {
-            //       _selectedCountry = value!;
-            //     });
-            //   },
-            // ),
             SizedBox(height: 40),
             _buildNextButton(() {
-              if (_personalFormKey.currentState!.validate()) {
-                _navigateToStep(1);
+
+                if (nameController.text.isEmpty) {
+                  // Show name validation error as toast
+                  Fluttertoast.showToast(msg: "Please enter your name",backgroundColor: Colors.red,textColor: Colors.white,  gravity: ToastGravity.CENTER,
+                  );
+                }
+               else if (emailController.text.isEmpty) {
+                  // Show email validation error as toast
+                  Fluttertoast.showToast(msg: "Please enter your email",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
+                }
+               else if (contactController.text.isEmpty) {
+                  // Show contact validation error as toast
+                  Fluttertoast.showToast(msg: "Please enter your contact number",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
+                }else if (dobController.text.isEmpty) {
+                  // Show email validation error as toast
+                  Fluttertoast.showToast(msg: "Please enter your Dob Brith",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
+                }
+
+               else {
+                  _navigateToStep(1);
+
+                }
               }
-            }),
+
+
+
+
+
+              // if (_personalFormKey.currentState!.validate()) {
+              //   _navigateToStep(1);
+              // }
+            ),
             SizedBox(height: 80),
 
           ],
@@ -542,44 +583,79 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
     );
   }
 
-  Widget _buildPhoneVerificationStep() {
+  Widget _buildBankInfoStep() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double horizontalPadding = screenWidth * 0.0;
+    double fontSize = screenWidth * 0.04;
     return Form(
-      key: _phoneFormKey,
+      key: _bankFormKey,
       child: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildSectionTitle("Verify Your Phone"),
-            SizedBox(height: 16),
-            TextFormField(
-              controller: _phoneController,
-              decoration: InputDecoration(
-                labelText: "Phone Number",
-                prefixIcon: Icon(Icons.phone_android),
-                hintText: "(xxx) xxx-xxxx",
-              ),
-              keyboardType: TextInputType.phone,
-              validator: (value) => value!.isEmpty ? "Required field" : null,
-            ),
-            SizedBox(height: 24),
+            _buildSectionTitle("Bank Information"),
 
-            Text(
-              "Select your preferred number",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.indigo.shade800
-              ),
-            ),
-            SizedBox(height: 8),
+            buildLabel("Account Number", fontSize),
+            buildTextField(
+              hint: "Enter account number",
+              keyboardType: TextInputType.number,
+              controller: bankAccountNoController,
+              fontSize: fontSize,
+              icon: Icons.account_balance,
 
-            _buildPhoneOption("(385) 121-4567", "(385) 121-4567"),
-            _buildPhoneOption("(385) 555-2200", "(385) 555-2200", selected: true),
-            _buildPhoneOption("(385) 121-4567", "(385) 121-4567_2"),
-            _buildPhoneOption("(385) 555-2200", "(385) 555-2200_2"),
+            ),
+
+            buildLabel("IFSC Code", fontSize),
+            buildTextField(
+              hint: "Enter IFSC Code",
+              controller: ifscController,
+              fontSize: fontSize,
+              icon: Icons.account_balance,
+              onChanged: (text) {
+                _onIFSCChanged(text);
+
+              },
+            ),
+
+            buildLabel("Bank Name", fontSize),
+            buildTextField(
+              hint: "Enter Bank Name",
+              controller: bankNameController,
+              fontSize: fontSize,
+              icon: Icons.person_outline,
+            ),
+
+            buildLabel("Branch Name", fontSize),
+            buildTextField(
+              hint: "Enter Branch Name",
+              controller: branchNameController,
+              fontSize: fontSize,
+              icon: Icons.person_outline,
+            ),
+
+
+            buildLabel("Bank City", fontSize),
+            buildTextField(
+              hint: "Enter Bank City",
+              controller: bankCityController,
+              fontSize: fontSize,
+              icon: Icons.location_city,
+            ),
+
+            buildLabel("Bank State", fontSize),
+
+            buildTextField(
+              hint: "Enter  Bank State",
+              controller: bankStateController,
+              fontSize: fontSize,
+              icon: Icons.language,
+            ),
+
+
 
             SizedBox(height: 40),
+
             Row(
               children: [
                 Expanded(
@@ -588,273 +664,307 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
                 SizedBox(width: 16),
                 Expanded(
                   child: _buildNextButton(() {
-                    if (_phoneFormKey.currentState!.validate() &&
-                        _selectedPhoneOption.isNotEmpty) {
-                      _navigateToStep(2);
-                    }
+                    _navigateToStep(2);
+
                   }),
                 ),
               ],
             ),
+
+            // _buildNextButton(() {
+            //   // if (_bankFormKey.currentState!.validate()) {
+            //   //   _navigateToStep(2);
+            //   // }
+            //
+            //   _navigateToStep(2);
+            //
+            // }),
+            SizedBox(height: 80),
+
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPhoneOption(String title, String value, {bool selected = false}) {
-    return Card(
-      elevation: _selectedPhoneOption == value ? 3 : 1,
-      margin: EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: _selectedPhoneOption == value ? Colors.indigo : Colors.transparent,
-          width: 2,
-        ),
-      ),
-      child: RadioListTile(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: _selectedPhoneOption == value ? FontWeight.bold : FontWeight.normal,
-          ),
-        ),
-        value: value,
-        groupValue: _selectedPhoneOption,
-        onChanged: (value) {
-          setState(() {
-            _selectedPhoneOption = value.toString();
-          });
-        },
-        activeColor: Colors.indigo,
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPurposeStep() {
-    return Form(
-      key: _purposeFormKey,
-      child: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSectionTitle("Setup Purpose"),
-            SizedBox(height: 16),
-
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.help_outline, color: Colors.indigo),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            "Thank you for calling XYZ Company. How can I help you?",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 24),
-
-            _buildPurposeExpansionTile(
-              "1. If they are calling",
-              [
-                {"title": "Cancel an appointment", "value": "Cancel an appointment"},
-              ],
-            ),
-
-            SizedBox(height: 16),
-
-            _buildPurposeExpansionTile(
-              "2. If they are calling",
-              [
-                {"title": "Ask about a product", "value": "Ask about a product"},
-                {"title": "Ask for their information", "value": "Ask for their information"},
-              ],
-            ),
-
-            SizedBox(height: 24),
-
-            if (_callingPurpose.isNotEmpty && _callingAction.isNotEmpty)
-              _buildSummarySection(),
-
-            SizedBox(height: 40),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _buildBackButton(() => _navigateToStep(1)),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo,
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    onPressed: () {
-                      if (_callingPurpose.isNotEmpty && _callingAction.isNotEmpty) {
-                        // Submit the form
-                        _showSuccessDialog();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Please select an option")),
-                        );
-                      }
-                    },
-                    icon: Icon(Icons.check_circle, color: Colors.white),
-                    label: Text(
-                      "Submit",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 16),
-            Center(
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  side: BorderSide(color: Colors.indigo.shade300),
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                ),
-                onPressed: () {
-                  // Add another option
-                },
-                icon: Icon(Icons.add, size: 20),
-                label: Text("Add another option"),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPurposeExpansionTile(String title, List<Map<String, String>> options) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ExpansionTile(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: Colors.indigo.shade800,
-          ),
-        ),
-        children: options.map((option) =>
-            RadioListTile(
-              title: Text(option["title"]!),
-              value: option["value"]!,
-              groupValue: _callingAction,
-              onChanged: (value) {
-                setState(() {
-                  _callingPurpose = title;
-                  _callingAction = value.toString();
-                });
-              },
-              activeColor: Colors.indigo,
-              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            ),
-        ).toList(),
-      ),
-    );
-  }
-
-  Widget _buildSummarySection() {
-    return Card(
-      elevation: 3,
-      color: Colors.indigo.shade50,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.indigo.shade200),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Registration Summary",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.indigo.shade800,
-              ),
-            ),
-            Divider(color: Colors.indigo.shade200),
-            _buildSummaryItem("Name", "${_firstNameController.text} ${_lastNameController.text}"),
-            _buildSummaryItem("Email", _emailController.text),
-            _buildSummaryItem("Country", _selectedCountry),
-            _buildSummaryItem("Phone", _selectedPhoneOption.split('_').first),
-            _buildSummaryItem("Purpose", _callingAction),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryItem(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+  Widget _buildOtherStep() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double horizontalPadding = screenWidth * 0.0;
+    double fontSize = screenWidth * 0.04;
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "$label: ",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.indigo.shade800,
-            ),
+          _buildSectionTitle("Others"),
+          buildLabel("Basic Pay ", fontSize),
+          buildTextField(
+            hint: "Enter amount ",
+            controller: basicPayController,
+            keyboardType: TextInputType.number,
+            fontSize: fontSize,
+            icon: Icons.currency_rupee,
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                color: Colors.indigo.shade700,
+
+          buildLabel("Joining Date", fontSize),
+          TextFormField(
+            controller: joiningDateController,
+            style: TextStyle(fontSize: fontSize),
+            decoration: InputDecoration(
+              hintText: "dd-mm-yyyy",
+              hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey[400]),
+              suffixIcon: Icon(Icons.calendar_today, color: Colors.indigo),
+            ),
+            readOnly: true,
+            onTap: () async {
+              DateTime? pickedDate = await showDatePicker(
+                context: context,
+                initialDate: DateTime(1990),
+                firstDate: DateTime(1950),
+                lastDate: DateTime.now(),
+                builder: (context, child) {
+                  return Theme(
+                    data: ThemeData.light().copyWith(
+                      colorScheme: ColorScheme.light(
+                        primary: Colors.indigo,
+                        onPrimary: Colors.white,
+                        surface: Colors.white,
+                      ),
+                      dialogBackgroundColor: Colors.white,
+                    ),
+                    child: child!,
+                  );
+                },
+              );
+              if (pickedDate != null) {
+                setState(() {
+                  joiningDateController.text = DateFormat('dd-MM-yyyy').format(pickedDate);
+                });
+              }
+            },
+            validator: (value) => value!.isEmpty ? "Required field" : null,
+          ),
+
+
+          buildLabel("Contract Type", fontSize),
+          buildDropdown(
+            items: ["Permanent", "Contract"],
+            onChanged: (value) => setState(() => contractType = value),
+            value: contractType,
+            fontSize: fontSize,
+            icon: Icons.work_outline,
+          ),
+
+          buildLabel("Blood Group", fontSize),
+          buildDropdown(
+            items: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+            onChanged: (value) => setState(() => bloodGroup = value),
+            value: bloodGroup,
+            fontSize: fontSize,
+            icon: Icons.bloodtype_outlined,
+          ),
+
+          buildLabel("Religion", fontSize),
+          buildDropdown(
+              items: ["Christianity", "Islam", "Hinduism", "Buddhism", "Judaism", "Other"],
+            onChanged: (value) => setState(() => religion = value),
+            value: religion,
+            fontSize: fontSize,
+            icon: Icons.person,
+          ),
+
+
+          buildLabel("Employee Type", fontSize),
+          buildDropdown(
+              items: ["Full-time", "Part-time", "Contract", "Intern", "Freelancer"],
+            onChanged: (value) => setState(() => employeetype = value),
+            value: employeetype,
+            fontSize: fontSize,
+            icon: Icons.person,
+          ),
+
+
+          buildLabel("Social Category", fontSize),
+          buildDropdown(
+              items: ["General", "OBC", "SC", "ST", "EWS", "Other"],
+            onChanged: (value) => setState(() => socialCategory = value),
+            value: socialCategory,
+            fontSize: fontSize,
+            icon: Icons.person,
+          ),
+
+          SizedBox(height: 40),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBackButton(() => _navigateToStep(2)),
               ),
-            ),
+              SizedBox(width: 16),
+              Expanded(
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () {
+                    _buildNextButton(() {
+                      _navigateToStep(4);
+
+                    });
+                  },
+                  icon: Icon(Icons.check_circle, color: Colors.white),
+                  label: Text(
+                    "Submit",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
+
+          SizedBox(height: 80),
+
         ],
       ),
     );
   }
+
+  Widget _buildDocumentsStep() {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double horizontalPadding = screenWidth * 0.0;
+    double fontSize = screenWidth * 0.04;
+    return SingleChildScrollView(
+      physics: BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle("Documents"),
+
+          // Document Name TextField
+          Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: TextField(
+              controller: _documentNameController,
+              decoration: InputDecoration(
+                labelText: 'Document Name',
+                hintText: 'Enter the name of the document',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12), // Rounded corners
+                ),
+                contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 20), // Adjust padding
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.blue, width: 2), // Blue border on focus
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: Colors.grey, width: 1), // Grey border when enabled
+                ),
+              ),
+            ),
+          ),
+
+          SizedBox(height: 20),
+
+          // Add More Button
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.bgYellow, // Change to your desired color
+              ),
+              onPressed: _addDocument,
+              child: Text('Add More',style: GoogleFonts.poppins(
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .displayLarge,
+                fontSize: TextSizes.text12,
+                fontWeight: FontWeight.w600,
+                fontStyle: FontStyle.normal,
+                color: AppColors.textWhite,
+              ),),
+            ),
+          ),
+          SizedBox(height: 40),
+
+          // Display added documents
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+            child: GridView.builder(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2, // Number of items per row (you can adjust this)
+                crossAxisSpacing: 10.0, // Space between columns
+                mainAxisSpacing: 10.0, // Space between rows
+              ),
+              itemCount: documents.length,
+              physics: NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.zero,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                var doc = documents[index];
+                return Card(
+                  elevation: 4,
+                  color: AppColors.bgYellow,
+                  child: Column(
+                    children: [
+                      Text(doc['name'], style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white)),
+                      doc['image'] != null
+                          ? SizedBox(
+                        height: 150.0,
+                        width: double.infinity,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0), // Optional: for rounded corners
+                          child: Image.file(
+                            File(doc['image']),
+                            fit: BoxFit.cover, // This ensures the image covers the available space
+                          ),
+                        ),
+                      )
+                          : Container(),
+                    ],
+                  ),
+                );
+
+              },
+            ),
+          ),
+
+          SizedBox(height: 40),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildBackButton(() => _navigateToStep(1)),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child:  Expanded(
+                  child: _buildNextButton(() {
+                    _navigateToStep(3);
+
+                  }),
+                ),
+              ),
+            ],
+          ),
+
+
+          // Next Button
+          // _buildNextButton(() {
+          //   // Navigate to the next step
+          //   _navigateToStep(3);
+          // }),
+          SizedBox(height: 80),
+        ],
+      ),
+    );
+  }
+
+
 
   Widget _buildSectionTitle(String title) {
     return Text(
@@ -959,11 +1069,18 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
     required double fontSize,
     required IconData icon,
     TextInputType? keyboardType,
+    void Function(String)? onChanged, // 👈 add this line
   }) {
     return TextFormField(
       controller: controller,
       style: TextStyle(fontSize: fontSize),
       keyboardType: keyboardType,
+      textInputAction: TextInputAction.next, // This makes the "Next" button appear
+      onEditingComplete: () {
+        // You can handle what happens when the "Next" button is pressed here
+        FocusScope.of(context).nextFocus(); // Move to the next field
+      },
+      onChanged: onChanged, // 👈 use it here
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey[400]),
@@ -980,6 +1097,79 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
       validator: (value) => value!.isEmpty ? "Required field" : null,
     );
   }
+
+  Widget buildTextFieldPinCode({
+    required String hint,
+    required TextEditingController controller,
+    required double fontSize,
+    required IconData icon,
+    TextInputType? keyboardType,
+    void Function(String)? onChanged, // 👈 add this line
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: TextStyle(fontSize: fontSize),
+      keyboardType: keyboardType,
+      maxLength: 6,  // Maximum length of 6 characters
+      textInputAction: TextInputAction.next, // This makes the "Next" button appear
+      onEditingComplete: () {
+        // You can handle what happens when the "Next" button is pressed here
+        FocusScope.of(context).nextFocus(); // Move to the next field
+      },
+      onChanged: onChanged, // 👈 use it here
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey[400]),
+        prefixIcon: Icon(icon, color: Colors.indigo),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent, width: 2),
+        ),
+      ),
+      validator: (value) => value!.isEmpty ? "Required field" : null,
+    );
+  }
+
+  Widget buildTextFieldContactNumber({
+    required String hint,
+    required TextEditingController controller,
+    required double fontSize,
+    required IconData icon,
+    TextInputType? keyboardType,
+    void Function(String)? onChanged, // 👈 add this line
+  }) {
+    return TextFormField(
+      controller: controller,
+      style: TextStyle(fontSize: fontSize),
+      keyboardType: keyboardType,
+      maxLength: 10,  // Maximum length of 6 characters
+      textInputAction: TextInputAction.next, // This makes the "Next" button appear
+      onEditingComplete: () {
+        // You can handle what happens when the "Next" button is pressed here
+        FocusScope.of(context).nextFocus(); // Move to the next field
+      },
+      onChanged: onChanged, // 👈 use it here
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey[400]),
+        prefixIcon: Icon(icon, color: Colors.indigo),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent, width: 2),
+        ),
+      ),
+      validator: (value) => value!.isEmpty ? "Required field" : null,
+    );
+  }
+
   Widget buildText({
     required String hint,
     required TextEditingController controller,
@@ -1025,3 +1215,7 @@ class _RegistrationPageState extends State<RegistrationPage> with SingleTickerPr
     );
   }
 }
+
+
+
+

@@ -8,11 +8,15 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import '../../Employee/Add/add_employee1.dart';
+import '../../Employee/Add/bsdhbhd.dart';
 import '../../Employee/Add/demo.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
+import 'DialogClass/addExpenseDialog.dart';
+import 'DialogClass/allowanceDialog.dart';
+import 'DialogClass/createSalleryDialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   List<Map<String, dynamic>> items = [
     {
       "icon": FaIcon(
@@ -780,6 +785,10 @@ class BottomCard extends StatefulWidget {
 }
 
 class _BottomCardState extends State<BottomCard> {
+  final AddExpenseDialog _addExpenseDialog = AddExpenseDialog();
+  final AllowanceDialog _allowanceDialog = AllowanceDialog();
+  final CreateSalleryDialog _createSalleryDialog = CreateSalleryDialog();
+
   List<Map<String, dynamic>> items = [
     {
       "icon": FaIcon(
@@ -943,12 +952,14 @@ class _BottomCardState extends State<BottomCard> {
                       ),
                     );
                   } else if(item['amount']=='Add Expenses'){
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: AddEmployeePage1(
-                        menuScreenContext: context,
-                      ),
-                    );
+                    _addExpenseDialog.show(context);
+
+                  } else if(item['amount']=='Allowance'){
+                    _allowanceDialog.show(context);
+
+                  }else if(item['amount']=='Create Salary'){
+                    _createSalleryDialog.show(context);
+
                   }
 
 
