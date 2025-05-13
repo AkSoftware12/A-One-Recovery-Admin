@@ -6,7 +6,7 @@ import 'package:intl/intl.dart'; // For date formatting
 import '../../../constants.dart';
 import '../../../textSize.dart';
 
-class AddExpenseDialog {
+class DeductionDialog {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
@@ -14,12 +14,7 @@ class AddExpenseDialog {
   final _formKey = GlobalKey<FormState>();
 
 
-  void show(BuildContext context,) {
-    DateTime now = DateTime.now();
-    String formattedDate = DateFormat('dd-MMM-yyyy').format(now);
-
-    _dateController.text=formattedDate;
-    print(formattedDate);
+  void show(BuildContext context) {
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
@@ -46,7 +41,7 @@ class AddExpenseDialog {
             ),
             child: Container(
               width: MediaQuery.of(context).size.width * 0.99, // 90% of screen width
-              height: MediaQuery.of(context).size.height * 0.7, // 60% of screen height
+              height: MediaQuery.of(context).size.height * 0.6, // 60% of screen height
               padding: EdgeInsets.all(16.sp),
               child: Column(
                 children: [
@@ -55,7 +50,7 @@ class AddExpenseDialog {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Add Expense',
+                        'Employee Deduction',
                         style: GoogleFonts.poppins(
                           textStyle: Theme.of(context).textTheme.displayLarge,
                           fontSize: TextSizes.text17,
@@ -85,7 +80,7 @@ class AddExpenseDialog {
                                 Padding(
                                   padding:  EdgeInsets.only(left: 8.sp),
                                   child: Text(
-                                    'Expense Category',
+                                    'Select Employee',
                                     style: GoogleFonts.poppins(
                                       textStyle: Theme.of(context).textTheme.displayLarge,
                                       fontSize: TextSizes.text14,
@@ -134,7 +129,103 @@ class AddExpenseDialog {
                                 ),
                               ),
                               hint: Text(
-                                'Select Category',
+                                'Select Employee',
+                                style: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text15,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.subTitleBlack.withOpacity(0.6),
+                                ),
+                              ),
+                              value: _selectedCategory,
+                              dropdownColor: Colors.white,
+                              items: <String>['Food', 'Travel', 'Office', 'Other']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: SizedBox(
+                                    height: 30.sp, // 👈 this makes each item box 30.sp high
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        value,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: Theme.of(context).textTheme.displayLarge,
+                                          fontSize: TextSizes.text15,
+                                          fontWeight: FontWeight.w500,
+                                          color: AppColors.subTitleBlack,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (String? newValue) {
+                                _selectedCategory = newValue;
+
+                              },
+                              validator: (value) =>
+                              value == null ? 'Please select a category' : null,
+                            ),
+                            SizedBox(height: 25.sp),
+
+
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding:  EdgeInsets.only(left: 8.sp),
+                                  child: Text(
+                                    'Deduction Type',
+                                    style: GoogleFonts.poppins(
+                                      textStyle: Theme.of(context).textTheme.displayLarge,
+                                      fontSize: TextSizes.text14,
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.textblack,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: Theme.of(context).textTheme.displayLarge,
+                                    fontSize: TextSizes.text17,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.textblack,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 5.sp,
+                            ),
+                            // Category Dropdown
+                            DropdownButtonFormField<String>(
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 20.sp,
+                                color: AppColors.subTitleBlack,
+                              ),
+                              decoration: InputDecoration(
+                                labelStyle: GoogleFonts.poppins(
+                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  fontSize: TextSizes.text15,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.subTitleBlack,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16.w,
+                                  vertical: 12.h,
+                                ),
+                              ),
+                              hint: Text(
+                                'Select Type',
                                 style: GoogleFonts.poppins(
                                   textStyle: Theme.of(context).textTheme.displayLarge,
                                   fontSize: TextSizes.text15,
@@ -246,159 +337,9 @@ class AddExpenseDialog {
                             ),
                             SizedBox(height: 25.sp),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding:  EdgeInsets.only(left: 8.sp),
-                                  child: Text(
-                                    'Issue Date',
-                                    style: GoogleFonts.poppins(
-                                      textStyle: Theme.of(context).textTheme.displayLarge,
-                                      fontSize: TextSizes.text14,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textblack,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '',
-                                  style: GoogleFonts.poppins(
-                                    textStyle: Theme.of(context).textTheme.displayLarge,
-                                    fontSize: TextSizes.text17,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textblack,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 5.sp,
-                            ),
-                            // Date Field
-                            TextFormField(
-                              controller: _dateController,
-                              decoration: InputDecoration(
-                                // labelText: 'Issue Date',
-                                hintText: 'dd-mm-yyyy',
-                                labelStyle: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
-                                  fontSize: TextSizes.text15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textblack,
-                                ),
-                                hintStyle: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
-                                  fontSize: TextSizes.text15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.subTitleBlack.withOpacity(0.6),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                suffixIcon: Icon(Icons.calendar_today, size: 18.sp), // <- moved here
 
-                                // prefixIcon: Icon(Icons.calendar_today, size: 20.sp),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.h,
-                                ),
-                              ),
-                              readOnly: true,
-                              onTap: () async {
-                                DateTime? pickedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2100),
-                                  builder: (context, child) {
-                                    return Theme(
-                                      data: Theme.of(context).copyWith(
-                                        colorScheme: ColorScheme.light(
-                                          primary: AppColors.bgYellow,
-                                          onPrimary: Colors.white,
-                                          surface: Colors.white,
-                                          onSurface: AppColors.textblack,
-                                        ),
-                                        dialogBackgroundColor: Colors.white,
-                                      ),
-                                      child: child!,
-                                    );
-                                  },
-                                );
-                                if (pickedDate != null) {
-                                  _dateController.text =
-                                      DateFormat('dd-MM-yyyy').format(pickedDate);
-                                }
-                              },
-                              validator: (value) =>
-                              value!.isEmpty ? 'Please select a date' : null,
-                            ),
-                            SizedBox(height: 25.sp),
 
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Padding(
-                                  padding:  EdgeInsets.only(left: 8.sp),
-                                  child: Text(
-                                    'Remark',
-                                    style: GoogleFonts.poppins(
-                                      textStyle: Theme.of(context).textTheme.displayLarge,
-                                      fontSize: TextSizes.text14,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textblack,
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  '',
-                                  style: GoogleFonts.poppins(
-                                    textStyle: Theme.of(context).textTheme.displayLarge,
-                                    fontSize: TextSizes.text17,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppColors.textblack,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 5.sp,
-                            ),
-                            // Remark Field
-                            TextFormField(
-                              controller: _remarkController,
-                              decoration: InputDecoration(
-                                hintText: 'Enter Remarks',
-                                labelStyle: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
-                                  fontSize: TextSizes.text15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.subTitleBlack,
-                                ),
-                                hintStyle: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
-                                  fontSize: TextSizes.text15,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.subTitleBlack.withOpacity(0.6),
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 16.w,
-                                  vertical: 12.h,
-                                ),
-                              ),
-                              maxLines: 3,
-                            ),
-                            SizedBox(height: 25.sp),
+
                           ],
                         ),
                       ),
@@ -447,7 +388,7 @@ class AddExpenseDialog {
                       ),
                       child: Center(
                         child: Text(
-                          'Add Expense',
+                          'Add Deduction',
                           style: GoogleFonts.poppins(
                             textStyle: Theme.of(context).textTheme.displayLarge,
                             fontSize: TextSizes.text15,

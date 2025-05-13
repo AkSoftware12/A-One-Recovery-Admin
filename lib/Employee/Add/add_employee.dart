@@ -14,14 +14,14 @@ import '../../textSize.dart';
 
 
 
-class RegistrationPage extends StatefulWidget {
-  const RegistrationPage({super.key, required BuildContext menuScreenContext});
+class AddEmployee extends StatefulWidget {
+  const AddEmployee({super.key, required BuildContext menuScreenContext});
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
 
-class _RegistrationPageState extends State<RegistrationPage> with SingleTickerProviderStateMixin {
+class _RegistrationPageState extends State<AddEmployee> with SingleTickerProviderStateMixin {
   int _currentStep = 0;
   final _personalFormKey = GlobalKey<FormState>();
   final _bankFormKey = GlobalKey<FormState>();

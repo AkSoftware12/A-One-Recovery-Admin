@@ -41,13 +41,8 @@ class AppAssets {
 class ApiRoutes {
 
 
-  // Gallery App url
-  static const String baseUrl2 = "https://webcjm.cjmambala.co.in/api";
-
-
   // Main App Url
-  static const String baseUrl = "https://testapi.cjmambala.co.in/api";
-  // static const String baseUrl = "https://apicjm.cjmambala.co.in/api";
+  static const String baseUrl = "https://aone.akdesire.com/api";
 
 
 // Local  App Url
@@ -58,24 +53,20 @@ class ApiRoutes {
 
 
   static const String login = "$baseUrl/login";
-  static const String loginstudent = "$baseUrl/loginstudent";
+  static const String logout = "$baseUrl/logout";
   static const String clear = "$baseUrl/clear";
-  static const String getProfile = "$baseUrl/student-get";
-  static const String getPhotos = "$baseUrl2/getPhotos";
-  static const String getVideos = "$baseUrl2/getVideos";
-  static const String getDashboard = "$baseUrl/dashboard";
-  static const String getFees = "$baseUrl/get-fees";
-  static const String getAssignments = "$baseUrl/get-assignments";
-  static const String getTimeTable = "$baseUrl/get-class-routine?day=";
-  static const String getSubject = "$baseUrl/get-subjects";
-  static const String studentDashboard = "$baseUrl/dashboard";
-  static const String uploadAssignment = "$baseUrl/submit-assignments";
-  static const String attendance = "$baseUrl/get-attendance-monthly";
-  static const String events = "$baseUrl/events";
-  static const String getlibrary = "$baseUrl/library-get";
+  static const String getProfile = "$baseUrl/get-profile";
+  static const String getEmployeeList = "$baseUrl/admin/employee-list";
+  static const String getExpensesList = "$baseUrl/admin/expance-list";
+  static const String getAllowanceList = "$baseUrl/admin/allowance-list";
+  static const String getDeductionList = "$baseUrl/admin/deduction-list";
+  static const String createAllowance = "$baseUrl/admin/allowance-create";
+  static const String getSalaryList = "$baseUrl/admin/salary-list";
+  static const String updateAllowanceList = "$baseUrl/admin/allowance-update";
+  static const String updateDeductionList= "$baseUrl/admin/deduction-update";
+  static const String deleteAllowanceList = "$baseUrl/admin/allowance-delete";
+  static const String deleteDeductionList  = "$baseUrl/admin/deduction-delete";
+  static const String getCategoryListExpanse = "$baseUrl/admin/category-list";
+  static const String createExpenses = "$baseUrl/admin/expance-create";
   static const String notifications = "$baseUrl/notifications";
-  static const String getBookTypes = "$baseUrl/book-types";
-  static const String getBookCategories = "$baseUrl/book-categories";
-  static const String getBookPublishers = "$baseUrl/book-publishers";
-  static const String getBookSupplier= "$baseUrl/book-supplier";
 }

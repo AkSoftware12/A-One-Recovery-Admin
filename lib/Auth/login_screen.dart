@@ -1,4 +1,6 @@
 
+import 'package:dio/dio.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../BottomNavigation/Bottom2/bottom2.dart';
 import '../../strings.dart';
 import '../constants.dart';
@@ -24,7 +27,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  // final Dio _dio = Dio(); // Initialize Dio
+  final Dio _dio = Dio(); // Initialize Dio
   bool _isLoading = false;
   bool _rememberMe = false;
   bool _isPasswordVisible = false;
@@ -52,88 +55,102 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
 
-  // Future<void> _login() async {
-  //   if (!_formKey.currentState!.validate()) return;
-  //
-  //   setState(() {
-  //     _isLoading = true;
-  //   });
-  //
-  //   try {
-  //     final response = await _dio.post(
-  //       ApiRoutes.login,
-  //       data: {
-  //         'email': _emailController.text,
-  //         'password': _passwordController.text,
-  //       },
-  //       options: Options(
-  //         headers: {'Content-Type': 'application/json'},
-  //       ),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       final jsonResponse = response.data; // FIX: No need to decode
-  //
-  //       if (jsonResponse['success'] == true) {
-  //         SharedPreferences prefs = await SharedPreferences.getInstance();
-  //         await prefs.setString('studentList', jsonEncode(jsonResponse['students']));
-  //         setState(() {
-  //           loginStudent = jsonResponse['students']; // Update state with fetched data
-  //           _isLoading = false;
-  //           print('Login Student: $loginStudent');
-  //         });
-  //
-  //         // Navigate to the bottom navigation screen
-  //         Navigator.pushReplacement(
-  //           context,
-  //           MaterialPageRoute(
-  //             builder: (context) => LoginStudentPage(),
-  //           ),
-  //         );
-  //       } else {
-  //         print('${AppStrings.loginFailedDebug}${jsonResponse['message']}');
-  //         _showErrorDialog(jsonResponse['message']);
-  //       }
-  //     } else {
-  //       print('${AppStrings.loginFailedMessage} ${response.statusCode}');
-  //       _showErrorDialog(AppStrings.loginFailedMessage);
-  //     }
-  //   } on DioException catch (e) {
-  //     String errorMessage = AppStrings.unexpectedError;
-  //     if (e.response != null && e.response?.data is Map<String, dynamic>) {
-  //       errorMessage = e.response?.data['message'] ?? errorMessage;
-  //     } else if (e.response?.data is String) {
-  //       errorMessage = e.response?.data;
-  //     }
-  //
-  //     _showErrorDialog(errorMessage);
-  //   } catch (e) {
-  //     print('${AppStrings.generalErrorDebug}$e');
-  //     _showErrorDialog(AppStrings.unexpectedError);
-  //   } finally {
-  //     setState(() {
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
-  //
-  // void _showErrorDialog(String message) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       title: const Text(AppStrings.loginFailedTitle),
-  //       content: Text(message),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () {
-  //             Navigator.of(ctx).pop();
-  //           },
-  //           child: const Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
+  Future<void> _login() async {
+    final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+    String? deviceToken = await _firebaseMessaging.getToken();
+    print('Device id: $deviceToken');
+    print('Email id: ${_emailController.text}');
+    print('password id: ${ _passwordController.text}');
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+
+
+    try {
+      final response = await _dio.post(
+        ApiRoutes.login,
+        data: {
+          'email': _emailController.text,
+          'password': _passwordController.text,
+          'device_id': deviceToken,
+        },
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = response.data;
+
+        if (responseData['success'] == true) {
+          // Save token in SharedPreferences
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', responseData['token']);
+          print('${AppStrings.tokenSaved}${responseData['token']}'); // Debug: Print the saved token
+
+          // Retrieve the token
+          String? token = prefs.getString('token');
+          print('${AppStrings.tokenRetrieved}$token');
+          PersistentNavBarNavigator.pushNewScreen(
+            context,
+            screen: ProvidedStylesExample(
+              menuScreenContext: context,
+            ),
+          );
+
+          // Debug: Print retrieved token
+
+          // Navigate to the BottomNavBarScreen with the token
+
+        } else {
+          print('${AppStrings.loginFailedDebug}${responseData['message']}'); // Debug: Print failure message
+          _showErrorDialog(responseData['message']);
+        }
+      } else {
+        print('${AppStrings.loginFailedMessage} ${response.statusCode}'); // Debug: Unexpected status code
+        _showErrorDialog(AppStrings.loginFailedMessage);
+      }
+
+
+    } on DioException catch (e) {
+      String errorMessage = AppStrings.unexpectedError;
+      if (e.response != null && e.response?.data is Map<String, dynamic>) {
+        errorMessage = e.response?.data['message'] ?? errorMessage;
+      } else if (e.response?.data is String) {
+        errorMessage = e.response?.data;
+      }
+
+      _showErrorDialog(errorMessage);
+    } catch (e) {
+      print('${AppStrings.generalErrorDebug}$e');
+      _showErrorDialog(AppStrings.unexpectedError);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text(AppStrings.loginFailedTitle),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -447,12 +464,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                                     horizontal: TextSizes.padding18),
                                 child: CustomLoginButton(
                                   onPressed: () {
-                                    PersistentNavBarNavigator.pushNewScreen(
-                                      context,
-                                      screen: ProvidedStylesExample(
-                                        menuScreenContext: context,
-                                      ),
-                                    );
+
+                                    _login();
+
                                   },
                                   title: AppStrings.signIn,
                                 ),

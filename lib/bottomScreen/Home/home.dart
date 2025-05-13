@@ -1,3 +1,9 @@
+import 'package:aoneadmin/bottomScreen/Home/AllList/deducation_list.dart';
+import 'package:aoneadmin/bottomScreen/Home/AllList/expenses_list.dart';
+import 'package:aoneadmin/bottomScreen/Home/AllList/allowances_list.dart';
+import 'package:aoneadmin/bottomScreen/Home/AllList/sallery_list.dart';
+import 'package:aoneadmin/bottomScreen/Home/DialogClass/deductionDialog.dart';
+import 'package:aoneadmin/bottomScreen/Home/DialogClass/manageFundDialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,13 +13,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import '../../Employee/Add/add_employee1.dart';
-import '../../Employee/Add/bsdhbhd.dart';
-import '../../Employee/Add/demo.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
+import 'AllList/employee_list.dart';
 import 'DialogClass/addExpenseDialog.dart';
 import 'DialogClass/allowanceDialog.dart';
 import 'DialogClass/createSalleryDialog.dart';
@@ -785,9 +789,10 @@ class BottomCard extends StatefulWidget {
 }
 
 class _BottomCardState extends State<BottomCard> {
-  final AddExpenseDialog _addExpenseDialog = AddExpenseDialog();
   final AllowanceDialog _allowanceDialog = AllowanceDialog();
   final CreateSalleryDialog _createSalleryDialog = CreateSalleryDialog();
+  final DeductionDialog _deductionDialog = DeductionDialog();
+  final ManageFundDialog _manageFundDialog = ManageFundDialog();
 
   List<Map<String, dynamic>> items = [
     {
@@ -798,7 +803,7 @@ class _BottomCardState extends State<BottomCard> {
       ),
       "title": "Total EMIs",
       "subtitle": "3.2%",
-      "amount": "Add Employee",
+      "amount": "Employee",
       "icon2": FaIcon(
         FontAwesomeIcons.arrowUp,
         size: 12.sp,
@@ -814,7 +819,7 @@ class _BottomCardState extends State<BottomCard> {
       ),
       "title": "Agents",
       "subtitle": "Active",
-      "amount": "Add Expenses",
+      "amount": "Expenses",
       "icon2": FaIcon(
         FontAwesomeIcons.userPlus,
         size: 12.sp,
@@ -848,7 +853,7 @@ class _BottomCardState extends State<BottomCard> {
       ),
       "title": "Total EMIs",
       "subtitle": "3.2%",
-      "amount": "Create Salary",
+      "amount": "Salary",
       "icon2": FaIcon(
         FontAwesomeIcons.arrowUp,
         size: 12.sp,
@@ -935,7 +940,7 @@ class _BottomCardState extends State<BottomCard> {
               crossAxisCount: 3, // 2 columns
               mainAxisSpacing: 15,
               crossAxisSpacing: 15,
-              childAspectRatio: 1, // adjust as needed
+              childAspectRatio: 0.94, // adjust as needed
             ),
             padding: const EdgeInsets.all(0),
             itemBuilder: (context, index) {
@@ -944,21 +949,53 @@ class _BottomCardState extends State<BottomCard> {
               return GestureDetector(
                 onTap: (){
 
-                  if(item['amount']=='Add Employee'){
+                  if(item['amount']=='Employee'){
+
                     PersistentNavBarNavigator.pushNewScreen(
                       context,
-                      screen: RegistrationPage(
+                      screen: EmployeeScreen(
                         menuScreenContext: context,
                       ),
                     );
-                  } else if(item['amount']=='Add Expenses'){
-                    _addExpenseDialog.show(context);
+                  } else if(item['amount']=='Expenses'){
+
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: ExpensesScreen(
+                        // menuScreenContext: context,
+                      ),
+                    );
 
                   } else if(item['amount']=='Allowance'){
-                    _allowanceDialog.show(context);
+                    // _allowanceDialog.show(context);
 
-                  }else if(item['amount']=='Create Salary'){
-                    _createSalleryDialog.show(context);
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: AllowanceScreen(
+                        // menuScreenContext: context,
+                      ),
+                    );
+
+                  }else if(item['amount']=='Salary'){
+                    // _createSalleryDialog.show(context);
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: SalaryScreen(
+                        // menuScreenContext: context,
+                      ),
+                    );
+
+                  }else if(item['amount']=='Deduction'){
+
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: DeducationScreen(
+                        // menuScreenContext: context,
+                      ),
+                    );
+
+                  }else if(item['amount']=='Manage Fund'){
+                    _manageFundDialog.show(context);
 
                   }
 
@@ -970,48 +1007,88 @@ class _BottomCardState extends State<BottomCard> {
                     color: AppColors.textWhite,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 45.sp,  // size
-                            height: 45.sp,
-                            decoration: BoxDecoration(
-                              color: item['color'],
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: item["icon"],
+                  child: Stack(
+                    children: [
+                      // Align(
+                      //   alignment: Alignment.topRight,
+                      //   child: Container(
+                      //     width: 25.sp,
+                      //     height: 20.sp,
+                      //     decoration: BoxDecoration(
+                      //         color: AppColors.bgYellow,
+                      //
+                      //         borderRadius:BorderRadius.all(Radius.circular(10))
+                      //     ),
+                      //     child: Center(
+                      //       child: Padding(
+                      //         padding: const EdgeInsets.all(5.0),
+                      //         child: Text('25',style: TextStyle(fontSize: 12.sp,color: Colors.white),),
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 45.sp,  // size
+                                height: 45.sp,
+                                decoration: BoxDecoration(
+                                  color: item['color'],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: item["icon"],
 
-                            ),
-                          ),
-                          SizedBox(height: 8.sp),
-                          Center(
-                            child: Text(
-                              items[index]['amount']
-                                  .toString() ??
-                                  '0.0',
-                              style: GoogleFonts.poppins(
-                                textStyle: Theme.of(context)
-                                    .textTheme
-                                    .displayLarge,
-                                fontSize: TextSizes.text12,
-                                fontWeight: FontWeight.w600,
-                                fontStyle: FontStyle.normal,
-                                color: AppColors.textblack,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                              SizedBox(height: 8.sp),
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                     '${ items[index]['amount'].toString()}',
+                                      style: GoogleFonts.poppins(
+                                        textStyle: Theme.of(context)
+                                            .textTheme
+                                            .displayLarge,
+                                        fontSize: TextSizes.text12,
+                                        fontWeight: FontWeight.w600,
+                                        fontStyle: FontStyle.normal,
+                                        color: AppColors.textblack,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    SizedBox(height: 5.sp),
 
+                                    Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(0.0),
+                                        child: Text('(${25})', style: GoogleFonts.poppins(
+                                          textStyle: Theme.of(context)
+                                              .textTheme
+                                              .displayLarge,
+                                          fontSize: TextSizes.text12,
+                                          fontWeight: FontWeight.w800,
+                                          fontStyle: FontStyle.normal,
+                                          color: AppColors.textblack,
+                                        ),),
+                                      ),
+                                    )
+                                  ],
+                                ),
+
+                              ),
+                              SizedBox(height: 8.sp),
+                            ],
                           ),
-                          SizedBox(height: 8.sp),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               );

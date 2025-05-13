@@ -1,16 +1,14 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart'; // For date formatting
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-
 import '../../../constants.dart';
 import '../../../textSize.dart';
 
-class AllowanceDialog {
+class EditAllowanceDialog {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _percentageController = TextEditingController();
@@ -19,13 +17,20 @@ class AllowanceDialog {
   String? _selectedType;
   final _formKey = GlobalKey<FormState>();
 
-  Future<bool> show(BuildContext context) async { // Changed to return Future<bool>
+
+  Future<bool> show(BuildContext context, String title, String type, String amount, String percentage) async {
     return await showGeneralDialog<bool>(
       context: context,
       barrierDismissible: false,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       transitionDuration: Duration(milliseconds: 300),
       transitionBuilder: (context, animation, secondaryAnimation, child) {
+        _titleController.text = title;
+        _amountController.text = amount;
+        _percentageController.text = percentage;
+        // Set _selectedType if type matches 'Amount' or 'Percentage'
+        _selectedType = ['Amount', 'Percentage'].contains(type) ? type : null;
+        _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
         return ScaleTransition(
           scale: CurvedAnimation(
             parent: animation,
@@ -62,7 +67,7 @@ class AllowanceDialog {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Add Allowance',
+                                'Edit Allowance',
                                 style: GoogleFonts.poppins(
                                   textStyle: Theme.of(context).textTheme.displayLarge,
                                   fontSize: TextSizes.text17,
@@ -338,7 +343,7 @@ class AllowanceDialog {
                                 // Show progress bar
                                 showDialog(
                                   context: context,
-                                  barrierDismissible: false, // Prevent dismissing dialog by tapping outside
+                                  barrierDismissible: false,
                                   builder: (context) => Center(
                                     child: CircularProgressIndicator(
                                       valueColor: AlwaysStoppedAnimation<Color>(AppColors.bgYellow),
@@ -355,12 +360,6 @@ class AllowanceDialog {
 
                                   // Show success or failure message
                                   if (success) {
-                                    // ScaffoldMessenger.of(context).showSnackBar(
-                                    //   SnackBar(
-                                    //     content: Text('Allowance Added Successfully!'),
-                                    //     backgroundColor: AppColors.bgYellow,
-                                    //   ),
-                                    // );
                                     Navigator.pop(context, true); // Return true on success
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -407,7 +406,7 @@ class AllowanceDialog {
                               ),
                               child: Center(
                                 child: Text(
-                                  'Add Allowance',
+                                  'Update Allowance',
                                   style: GoogleFonts.poppins(
                                     textStyle: Theme.of(context).textTheme.displayLarge,
                                     fontSize: TextSizes.text15,
@@ -430,7 +429,6 @@ class AllowanceDialog {
       },
     ) ?? false; // Return false if dialog is dismissed without a result
   }
-
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
@@ -438,7 +436,6 @@ class AllowanceDialog {
     _dateController.dispose();
     _remarkController.dispose();
   }
-
   Future<bool> createAllowance() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -480,4 +477,5 @@ class AllowanceDialog {
       return false; // Indicate failure
     }
   }
+
 }

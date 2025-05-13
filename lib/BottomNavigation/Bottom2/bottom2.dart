@@ -7,10 +7,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../Auth/login_screen.dart';
 import '../../HexColorCode/HexColor.dart';
+import '../../bottomScreen/Home/AllList/expenses_list.dart';
+import '../../bottomScreen/Home/AllList/sallery_list.dart';
 import '../../bottomScreen/Home/home.dart';
+import '../../bottomScreen/Profile/profile.dart';
 import '../../constants.dart';
 import '../../textSize.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 BuildContext? testContext;
 
@@ -32,12 +39,13 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     ScrollController(),
     ScrollController(),
   ];
-
+  String? username;
   NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   @override
   void initState() {
     super.initState();
+    getName();
     _controller = PersistentTabController(initialIndex: 0);
     _hideNavBar = false;
   }
@@ -49,21 +57,80 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     }
     super.dispose();
   }
+  void getName() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      username = prefs.getString('username');
+
+    });
+    print(username);
+  }
+
+
+  Future<void> logoutApi(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent user from dismissing dialog
+      builder: (BuildContext context) {
+        return Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(
+                color: Colors.orangeAccent,
+              ),
+              // SizedBox(width: 16.0),
+              // Text("Logging in..."),
+            ],
+          ),
+        );
+      },
+    );
+
+    try {
+      // Replace 'your_token_here' with your actual token
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs.getString('token');
+      final Uri uri = Uri.parse(ApiRoutes.logout);
+      final Map<String, String> headers = {'Authorization': 'Bearer $token'};
+      print('Token: $token');
+
+      final response = await http.post(uri, headers: headers);
+
+
+      if (response.statusCode == 200) {
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.remove('isLoggedIn',);
+
+        // If the server returns a 200 OK response, parse the data
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return LoginPage();
+            },
+          ),
+        );
+      } else {
+        // If the server did not return a 200 OK response,
+        // throw an exception.
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      Navigator.pop(context); // Close the progress dialog
+      // Handle errors appropriately
+      print('Error during logout: $e');
+      // Show a snackbar or display an error message
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to log out. Please try again.'),
+      ));
+    }
+  }
 
   List<Widget> _buildScreens() => [
         HomeScreen(),
-        // MainScreen(
-        //   menuScreenContext: widget.menuScreenContext,
-        //   scrollController: _scrollControllers.first,
-        //   hideStatus: _hideNavBar,
-        //   onScreenHideButtonPressed: () {
-        //     setState(() {
-        //       _hideNavBar = !_hideNavBar;
-        //     });
-        //   },
-        //   onNavBarStyleChanged: (final value) =>
-        //       setState(() => _navBarStyle = value),
-        // ),
+
         MainScreen(
           menuScreenContext: widget.menuScreenContext,
           hideStatus: _hideNavBar,
@@ -75,40 +142,9 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
           onNavBarStyleChanged: (final value) =>
               setState(() => _navBarStyle = value),
         ),
-        MainScreen(
-          menuScreenContext: widget.menuScreenContext,
-          hideStatus: _hideNavBar,
-          onScreenHideButtonPressed: () {
-            setState(() {
-              _hideNavBar = !_hideNavBar;
-            });
-          },
-          onNavBarStyleChanged: (final value) =>
-              setState(() => _navBarStyle = value),
-        ),
-        MainScreen(
-          menuScreenContext: widget.menuScreenContext,
-          hideStatus: _hideNavBar,
-          onScreenHideButtonPressed: () {
-            setState(() {
-              _hideNavBar = !_hideNavBar;
-            });
-          },
-          onNavBarStyleChanged: (final value) =>
-              setState(() => _navBarStyle = value),
-        ),
-        MainScreen(
-          menuScreenContext: widget.menuScreenContext,
-          scrollController: _scrollControllers.last,
-          hideStatus: _hideNavBar,
-          onScreenHideButtonPressed: () {
-            setState(() {
-              _hideNavBar = !_hideNavBar;
-            });
-          },
-          onNavBarStyleChanged: (final value) =>
-              setState(() => _navBarStyle = value),
-        ),
+    SalaryScreen(),
+    ExpensesScreen(),
+    ProfileScreen(),
       ];
 
   Color? _getSecondaryItemColorForSpecificStyles() =>
@@ -235,132 +271,123 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
 
   Widget _buildAppBar() {
     return Padding(
-      padding: EdgeInsets.only(top: TextSizes.padding30),
+      padding: EdgeInsets.only(top: 30.sp),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // Left side with menu and user info
           Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Menu Button
               Builder(
-                builder: (context) => Padding(
-                  padding: EdgeInsets.all(0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    child: Container(
-                      height: MediaQuery.of(context).size.width * 0.1,
-                      width: MediaQuery.of(context).size.width * 0.1,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.shade200,
-                        // background color, change as needed
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          )
-                        ],
-                      ),
-                      child: Center(
-                        child: Image.asset(
-                          'assets/menu.png',
-                          height: MediaQuery.of(context).size.width * 0.05,
-                          width: MediaQuery.of(context).size.width * 0.05,
-                          color: AppColors.textblack,
+                builder: (context) => GestureDetector(
+                  onTap: () => Scaffold.of(context).openDrawer(),
+                  child: Container(
+                    width: 40.sp, // Equal width and height for perfect circle
+                    height: 40.sp,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6.sp,
+                          offset: Offset(0, 3.sp),
                         ),
+                      ],
+                    ),
+                    child: Center( // Center the icon for better alignment
+                      child: Icon(
+                        Icons.menu_rounded,
+                        size: 20.sp,
+                        color: AppColors.textWhite,
                       ),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: 12.sp),
+              // User Info
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Admin!',
+                    username.toString(), // Ensure username is defined
                     style: GoogleFonts.poppins(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.w700,
-                      fontStyle: FontStyle.normal,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
                       color: AppColors.textWhite,
                     ),
                   ),
+                  SizedBox(height: 2.sp),
                   Text(
-                    // studentData?['student_name'].toString()??'Student Name',
-                    'Admin ID : ${'2100101'}',
+                    'Admin ID: 2100101',
                     style: GoogleFonts.poppins(
-                      textStyle: Theme.of(context).textTheme.displayLarge,
-                      fontSize: 11.sp,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: FontStyle.normal,
-                      color: AppColors.subTitlewhite,
+                      fontSize: 10.sp,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.subTitlewhite.withOpacity(0.8),
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          Builder(
-            builder: (context) => Padding(
-              padding: EdgeInsets.all(0),
-              child: GestureDetector(
-                onTap: () {
-                  // Notification icon tapped
-                },
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  // So badge can overflow outside stack
-                  children: [
-                    Icon(
-                      Icons.notification_add,
-                      color: AppColors.textWhite,
-                      size: 23.sp,
-                    ),
-
-                    // Notification Count Badge
-                    Positioned(
-                      right: -4, // adjust as needed
-                      top: -4, // adjust as needed
-                      child: Container(
-                        padding: EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
+          // Notification Button
+          GestureDetector(
+            onTap: () {
+              // Handle notification tap
+            },
+            child: Container(
+              width: 40.sp, // Equal width and height for perfect circle
+              height: 40.sp,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.2),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Icon(
+                    Icons.notifications_none_rounded,
+                    size: 22.sp,
+                    color: AppColors.textWhite,
+                  ),
+                  Positioned(
+                    right: 8.sp,
+                    top: 8.sp,
+                    child: Container(
+                      width: 16.sp,
+                      height: 16.sp,
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 1.5.sp,
                         ),
-                        constraints: BoxConstraints(
-                          minWidth: 16,
-                          minHeight: 16,
-                        ),
-                        child: Center(
-                          child: Text(
-                            '3', // <-- your dynamic notification count here
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10.sp,
-                            ),
-                            textAlign: TextAlign.center,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '3',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
-
   @override
   Widget build(BuildContext context) {
     // final packageInfo = await PackageInfo.fromPlatform();
@@ -484,6 +511,15 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         ],
                       ),
                     ),
+                    ListTile(
+                      leading: Icon(Icons.logout, color: Colors.black),
+                      title: Text("Logout", style: TextStyle(color: Colors.black)),
+                      onTap: () {
+                        Navigator.pop(context); // Close the progress dialog
+
+                        logoutApi(context);
+                      },
+                    ),
 
 
                   ],
@@ -512,7 +548,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
             decoration: BoxDecoration(
               color: AppColors.bgYellow,
               borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(0.sp),
+                bottom: Radius.circular(20.sp),
               ),
               // border: Border.all(
               //   color: Colors.purple.shade100, // Or any color you want
@@ -604,7 +640,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
               ),
               confineToSafeArea: true,
               // navBarHeight: kBottomNavigationBarHeight,
-              navBarHeight: 55.sp,
+              navBarHeight: 50.sp,
               navBarStyle: _navBarStyle,
             ),
           ),
