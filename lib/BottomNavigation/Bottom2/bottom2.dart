@@ -337,8 +337,15 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
           // Notification Button
           GestureDetector(
             onTap: () {
-              // Handle notification tap
-            },
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) {
+              //       return SalaryHomePage();
+              //     },
+              //   ),
+              // );
+              },
             child: Container(
               width: 40.sp, // Equal width and height for perfect circle
               height: 40.sp,

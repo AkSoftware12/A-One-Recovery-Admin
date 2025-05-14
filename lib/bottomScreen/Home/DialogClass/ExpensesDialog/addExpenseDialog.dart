@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart'; // For date formatting
 
-import '../../../constants.dart';
-import '../../../textSize.dart';
+import '../../../../constants.dart';
+import '../../../../textSize.dart';
 
 class AddExpenseDialog {
   final TextEditingController _amountController = TextEditingController();

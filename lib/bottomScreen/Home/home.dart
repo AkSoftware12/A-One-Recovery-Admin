@@ -2,7 +2,7 @@ import 'package:aoneadmin/bottomScreen/Home/AllList/deducation_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/expenses_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/allowances_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/sallery_list.dart';
-import 'package:aoneadmin/bottomScreen/Home/DialogClass/deductionDialog.dart';
+import 'package:aoneadmin/bottomScreen/Home/EmployeeDeductionDialog/employeeDeductionDialog.dart';
 import 'package:aoneadmin/bottomScreen/Home/DialogClass/manageFundDialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +18,8 @@ import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
 import 'AllList/employee_list.dart';
-import 'DialogClass/addExpenseDialog.dart';
-import 'DialogClass/allowanceDialog.dart';
+import 'DialogClass/ExpensesDialog/addExpenseDialog.dart';
+import 'DialogClass/AllowanceDialog/addAllowanceDialog.dart';
 import 'DialogClass/createSalleryDialog.dart';
 
 class HomeScreen extends StatefulWidget {

@@ -1,14 +1,12 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
-import '../../../constants.dart';
-import '../../../textSize.dart';
+import '../../../../constants.dart';
+import '../../../../textSize.dart';
 
 class AllowanceDialog {
   final TextEditingController _titleController = TextEditingController();
@@ -352,15 +350,8 @@ class AllowanceDialog {
 
                                   // Close progress bar
                                   Navigator.pop(context); // Close the dialog
-
                                   // Show success or failure message
                                   if (success) {
-                                    // ScaffoldMessenger.of(context).showSnackBar(
-                                    //   SnackBar(
-                                    //     content: Text('Allowance Added Successfully!'),
-                                    //     backgroundColor: AppColors.bgYellow,
-                                    //   ),
-                                    // );
                                     Navigator.pop(context, true); // Return true on success
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(

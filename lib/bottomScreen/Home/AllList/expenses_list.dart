@@ -6,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../DialogClass/addExpenseDialog.dart'; // Adjust path as needed
+import '../DialogClass/ExpensesDialog/addExpenseDialog.dart'; // Adjust path as needed
 import '../../../constants.dart'; // Adjust path as needed
 import '../../../textSize.dart'; // Adjust path as needed
 

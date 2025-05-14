@@ -6,11 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../DialogClass/addExpenseDialog.dart'; // Adjust path as needed
+import '../DialogClass/ExpensesDialog/addExpenseDialog.dart'; // Adjust path as needed
 import '../../../constants.dart'; // Adjust path as needed
 import '../../../textSize.dart';
-import '../DialogClass/allowanceDialog.dart';
-import '../DialogClass/editallowanceDialog.dart'; // Adjust path as needed
+import '../DialogClass/AllowanceDialog/addAllowanceDialog.dart';
+import '../DialogClass/AllowanceDialog/editallowanceDialog.dart'; // Adjust path as needed
 
 class AllowanceScreen extends StatefulWidget {
   const AllowanceScreen({super.key});
@@ -262,146 +262,6 @@ class _ExpensesScreenState extends State<AllowanceScreen>
     );
   }
 
-  void _showPaymentCanceledDialog(BuildContext context,String allowanceId) {
-    bool isDeleting = false;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          ),
-          titlePadding: EdgeInsets.zero,
-          contentPadding: EdgeInsets.zero,
-          content: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.red.shade400, Colors.red.shade400],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(20.0),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 20),
-                Icon(
-                  Icons.delete,
-                  color: Colors.white,
-                  size: 80,
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Delete Allowance',
-                  style: GoogleFonts.montserrat(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 22.sp,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Text(
-                    'Are you sure you want to delete this allowance? This action cannot be undone.',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.montserrat(
-                      color: Colors.white70,
-                      fontSize: 16.sp,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding:  EdgeInsets.only(right: 15.sp),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      TextButton(
-                        onPressed: isDeleting ? null : () => Navigator.pop(context),
-                        child: Text(
-                          'Cancel',
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: isDeleting
-                            ? null
-                            : () async {
-                          setState(() => isDeleting = true);
-                          try {
-                            await deleteAllowance(allowanceId);
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Allowance deleted successfully'),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                          } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Failed to delete allowance: $e'),
-                                backgroundColor: Colors.red.shade100,
-                              ),
-                            );
-                          } finally {
-                            setState(() => isDeleting = false);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red.shade100,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                        child: isDeleting
-                            ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                            : Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.delete, color: Colors.white, size: 18),
-                            SizedBox(width: 4),
-                            Text(
-                              'Delete',
-                              style: GoogleFonts.poppins(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-
-
-        );
-      },
-    );
-  }
 
   @override
   void dispose() {
@@ -425,9 +285,7 @@ class _ExpensesScreenState extends State<AllowanceScreen>
               // Refresh the list if allowance was added successfully
               await fetchExpenseData();
             }
-            // _allowanceDialog.show(context);
 
-            // _addExpenseDialog.show(context).then((_) => fetchExpenseData());
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF0066CC),
@@ -767,12 +625,20 @@ class _ExpensesScreenState extends State<AllowanceScreen>
                                         builder: (context) => CustomConfirmationDialog(
                                           title: "Edit Allowance",
                                           message: "Are you sure you want to save the changes?",
-                                          onConfirm: () {
+                                          onConfirm: () async {
                                             Navigator.pop(context);
-                                            editExpenseDialog.show(context, Allowance['name'].toString(),
+                                            final editExpenseDialog = EditAllowanceDialog();
+                                            final result = await editExpenseDialog.show(context, Allowance['name'].toString(),
                                               Allowance['type'].toString(),
                                               Allowance['amount'].toString(),
-                                              Allowance['percentange'].toString(),);
+                                              Allowance['percentange'].toString(),
+                                              Allowance['id'].toString(),
+                                            ); // Show dialog and wait for result
+                                            if (result) {
+                                            // Refresh the list if allowance was added successfully
+                                            await fetchExpenseData();
+                                            }
+
                                           },
                                           onYes: () {
                                             Navigator.pop(context);
@@ -790,7 +656,6 @@ class _ExpensesScreenState extends State<AllowanceScreen>
                                   icon: Icon(Icons.delete,
                                       size: 20.sp, color: Colors.red),
                                   onPressed: () => _showDeleteConfirmation(Allowance['id'].toString()),
-                                  // onPressed: () => _showPaymentCanceledDialog(context,Allowance['id'].toString()),
                                 ),
                               ],
                             ),

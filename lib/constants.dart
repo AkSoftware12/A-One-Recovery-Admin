@@ -56,16 +56,32 @@ class ApiRoutes {
   static const String logout = "$baseUrl/logout";
   static const String clear = "$baseUrl/clear";
   static const String getProfile = "$baseUrl/get-profile";
+
+
   static const String getEmployeeList = "$baseUrl/admin/employee-list";
   static const String getExpensesList = "$baseUrl/admin/expance-list";
+
   static const String getAllowanceList = "$baseUrl/admin/allowance-list";
-  static const String getDeductionList = "$baseUrl/admin/deduction-list";
-  static const String createAllowance = "$baseUrl/admin/allowance-create";
-  static const String getSalaryList = "$baseUrl/admin/salary-list";
   static const String updateAllowanceList = "$baseUrl/admin/allowance-update";
-  static const String updateDeductionList= "$baseUrl/admin/deduction-update";
+  static const String createAllowance = "$baseUrl/admin/allowance-create";
+  static const String detailAllowance = "$baseUrl/admin/allowance";
   static const String deleteAllowanceList = "$baseUrl/admin/allowance-delete";
+
+
+  static const String getDeductionList = "$baseUrl/admin/deduction-list";
   static const String deleteDeductionList  = "$baseUrl/admin/deduction-delete";
+  static const String updateDeductionList= "$baseUrl/admin/deduction-update";
+  static const String createDeduction = "$baseUrl/admin/deduction-create";
+
+
+
+
+  static const String getSalaryList = "$baseUrl/admin/salary-list";
+  static const String genrateSalary = "$baseUrl/admin/salary-genrate";
+  static const String genrateSlip = "$baseUrl/admin/salary-slip/";
+
+
+
   static const String getCategoryListExpanse = "$baseUrl/admin/category-list";
   static const String createExpenses = "$baseUrl/admin/expance-create";
   static const String notifications = "$baseUrl/notifications";
