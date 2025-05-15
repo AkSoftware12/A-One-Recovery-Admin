@@ -22,7 +22,7 @@ class SalaryScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<SalaryScreen>
     with SingleTickerProviderStateMixin {
-  final AddExpenseDialog _addExpenseDialog = AddExpenseDialog();
+  final AddExpensesDialog _addExpenseDialog = AddExpensesDialog();
   bool isLoading = false;
   List Salary = [];
   List filteredExpenses = [];

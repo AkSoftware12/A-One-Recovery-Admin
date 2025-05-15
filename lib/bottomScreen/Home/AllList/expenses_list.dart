@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:animate_do/animate_do.dart';
 import 'package:aoneadmin/HexColorCode/HexColor.dart';
+import 'package:aoneadmin/strings.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../DialogClass/ExpensesDialog/addExpenseDialog.dart'; // Adjust path as needed
 import '../../../constants.dart'; // Adjust path as needed
-import '../../../textSize.dart'; // Adjust path as needed
+import '../../../textSize.dart';
+import '../DialogClass/ExpensesDialog/editExpensesDialog.dart'; // Adjust path as needed
 
 class ExpensesScreen extends StatefulWidget {
   const ExpensesScreen({super.key});
@@ -19,12 +22,14 @@ class ExpensesScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<ExpensesScreen>
     with SingleTickerProviderStateMixin {
-  final AddExpenseDialog _addExpenseDialog = AddExpenseDialog();
+  final AddExpensesDialog _addExpenseDialog = AddExpensesDialog();
   bool isLoading = false;
   List expenses = [];
   List categoryExpenses = [];
   List filteredExpenses = [];
+
   TextEditingController searchController = TextEditingController();
+  TextEditingController title = TextEditingController();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -43,7 +48,10 @@ class _ExpensesScreenState extends State<ExpensesScreen>
     searchController.addListener(_filterExpenses);
     _animationController.forward();
     fetchExpenseCategoryData();
+
   }
+
+
 
   Future<void> fetchExpenseData() async {
     setState(() {
@@ -76,7 +84,6 @@ class _ExpensesScreenState extends State<ExpensesScreen>
     }
   }
   Future<void> fetchExpenseCategoryData() async {
-
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     print('Token: $token');
@@ -91,6 +98,7 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       setState(() {
         categoryExpenses = data['data'];
         isLoading = false;
+        print(categoryExpenses);
       });
     } else {
       setState(() {
@@ -126,6 +134,710 @@ class _ExpensesScreenState extends State<ExpensesScreen>
     super.dispose();
   }
 
+
+
+  void _showCategoryListDialog(BuildContext context,) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      barrierColor: Colors.black54,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Container(
+          decoration: BoxDecoration(
+            color: HexColor('#1b2939'),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: EdgeInsets.only(
+              top: 16,
+              left: 20,
+              right: 20,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 56,
+                    height: 6,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Categories List',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    Container(
+                      height: 42,
+                      width: 90,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        gradient: LinearGradient(
+                          colors: [
+                            Theme.of(context).primaryColor,
+                            Theme.of(context).primaryColorLight,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Theme.of(context).primaryColor.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () {
+                              Navigator.pop(context);
+                              _showCategoryDialog();
+                            },
+                            splashColor: Colors.white.withOpacity(0.2),
+                            highlightColor: Colors.white.withOpacity(0.1),
+                            child: Center(
+                              child: Text(
+                                'ADD NEW',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                  letterSpacing: 0.4,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height*0.5, // Increased height for better scrolling experience
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: categoryExpenses.length,
+                    itemBuilder: (context, index) {
+                      return ZoomIn(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: HexColor('#2a3b4c'),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  // Add category selection logic if needed
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      ZoomIn(
+                                        child: CircleAvatar(
+                                          radius: 18,
+                                          backgroundColor: Colors.teal[600],
+                                          child: Text(
+                                            categoryExpenses[index]['title'][0].toUpperCase(),
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 5.sp,),
+
+
+                                      Expanded(
+                                        child: Text(
+                                          categoryExpenses[index]['title'].toString().toUpperCase(),
+                                          style: GoogleFonts.poppins(
+                                            color: Colors.white,
+                                            fontSize: 13.sp,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(
+                                              Icons.edit,
+                                              color: Colors.blue[300],
+                                              size: 22,
+                                            ),
+                                            onPressed: () {
+                                              _showCategoryUpdateDialog(categoryExpenses[index]['title'].toString(),categoryExpenses[index]['id'].toString());
+                                              // Implement edit category logic
+                                             // _showEditCategoryDialog(categoryExpenses[index]);
+                                            },
+                                            tooltip: 'Edit Category',
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.delete,
+                                                size: 20.sp, color: Colors.red),
+                                            onPressed: () => _showDeleteCategory( categoryExpenses[index]['id'].toString(),index),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showCategoryDialog() {
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: HexColor('#1b2939'), // Remove default background
+      useRootNavigator: true,
+      isScrollControlled: true,
+      barrierColor: Colors.black54, // Darker overlay for better focus
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  'Add Category',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                      color: Colors.white
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Add Category Card (Neumorphic Style)
+              TextField(
+                controller: title,
+                style: const TextStyle(
+                  color: Colors.black, // Ensure text is readable
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  // labelText: 'Category Name',
+                  // labelStyle: TextStyle(
+                  //   color: Colors.white.withOpacity(0.9),
+                  //   fontSize: 16,
+                  //   fontWeight: FontWeight.w600,
+                  // ),
+                  hintText: 'Enter category name', // Added for better UX
+                  hintStyle: TextStyle(
+                    color: Colors.black.withOpacity(0.6),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white, // Subtle background
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Rounded input
+                    borderSide: BorderSide.none, // Clean look
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 40.sp,
+              ),
+              Container(
+                height: 50.sp,
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15), // Ultra-smooth corners
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.9), // Vibrant primary
+                      Theme.of(context).primaryColorLight.withOpacity(0.7), // Softer secondary
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: const [0.0, 1.0],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      blurRadius: 14,
+                      spreadRadius: 3,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () {
+                        Navigator.pop(context);
+                        addCategory(title.text.trim());
+                        title.clear();
+                          },
+                      splashColor: Colors.white.withOpacity(0.2),
+                      highlightColor: Colors.white.withOpacity(0.1),
+                      child: Center(
+                        child: Text(
+                          'ADD',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.3,
+
+                          ),
+
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+
+  }
+  void _showCategoryUpdateDialog(String initialText,String id ) {
+
+    title.text = initialText;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: HexColor('#1b2939'), // Remove default background
+      useRootNavigator: true,
+      isScrollControlled: true,
+      barrierColor: Colors.black54, // Darker overlay for better focus
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 16,
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Text(
+                  'Update  Category',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                      color: Colors.white
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Add Category Card (Neumorphic Style)
+              TextField(
+                controller: title,
+                style: const TextStyle(
+                  color: Colors.black, // Ensure text is readable
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  // labelText: 'Category Name',
+                  // labelStyle: TextStyle(
+                  //   color: Colors.white.withOpacity(0.9),
+                  //   fontSize: 16,
+                  //   fontWeight: FontWeight.w600,
+                  // ),
+                  hintText: 'Enter category name', // Added for better UX
+                  hintStyle: TextStyle(
+                    color: Colors.black.withOpacity(0.6),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white, // Subtle background
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12), // Rounded input
+                    borderSide: BorderSide.none, // Clean look
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 40.sp,
+              ),
+              Container(
+                height: 50.sp,
+                margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15), // Ultra-smooth corners
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.9), // Vibrant primary
+                      Theme.of(context).primaryColorLight.withOpacity(0.7), // Softer secondary
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    stops: const [0.0, 1.0],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      blurRadius: 14,
+                      spreadRadius: 3,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(24),
+                      onTap: () {
+                        Navigator.pop(context);
+                        updateCategory(title.text.trim(),id);
+                        title.clear();
+                      },
+                      splashColor: Colors.white.withOpacity(0.2),
+                      highlightColor: Colors.white.withOpacity(0.1),
+                      child: Center(
+                        child: Text(
+                          'UPDATE',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                            letterSpacing: 0.3,
+
+                          ),
+
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+
+  }
+  Future<void> addCategory(String title) async {
+    if (title.isEmpty || title.trim().length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a valid category title')),
+      );
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Authentication token not found')),
+        );
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse(ApiRoutes.createCategoryExpenses), // Replace with correct endpoint
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'title': title.trim(),
+          // Add other required fields if needed
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        fetchExpenseCategoryData(); // Refresh data
+        _showSuccessPopup(context,'added');
+      } else {
+        final error = jsonDecode(response.body);
+        String message = error['message'] ?? 'Failed to add category: ${response.statusCode}';
+        print('Response body: ${response.body}'); // Debugging
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+  Future<void> updateCategory(String title,String id) async {
+    if (title.isEmpty || title.trim().length < 3) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please enter a valid category title')),
+      );
+      return;
+    }
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Authentication token not found')),
+        );
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('${ApiRoutes.updateCategory}/$id'), // Replace with correct endpoint
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'title': title.trim(),
+          // Add other required fields if needed
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        fetchExpenseCategoryData(); // Refresh data
+        _showSuccessPopup(context,'update');
+      } else {
+        final error = jsonDecode(response.body);
+        String message = error['message'] ?? 'Failed to add category: ${response.statusCode}';
+        print('Response body: ${response.body}'); // Debugging
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+  void _showSuccessPopup(BuildContext context, String title) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        return ScaleTransition(
+          scale: CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutBack,
+          ),
+          child: child,
+        );
+      },
+      pageBuilder: (context, animation, secondaryAnimation) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 8,
+          backgroundColor: Colors.white,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.85,
+              minWidth: 280,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Success Icon
+                ZoomIn(
+                  duration: const Duration(milliseconds: 400),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Colors.green,
+                    size: 60,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Title
+                Text(
+                  'Success',
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.black87,
+                  ),
+                  semanticsLabel: 'Success',
+                ),
+                const SizedBox(height: 8),
+                // Content
+                Text(
+                  'Category ${title} successfully!',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: Colors.black54,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                // Action Button
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme.of(context).primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                    elevation: 2,
+                  ),
+                  child: Text(
+                    'OK',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,7 +846,286 @@ class _ExpensesScreenState extends State<ExpensesScreen>
         padding: EdgeInsets.only(bottom: 65.sp),
         child: ElevatedButton(
           onPressed: () {
-            _addExpenseDialog.show(context);
+
+            showModalBottomSheet(
+              context: context,
+              backgroundColor: HexColor('#1b2939'), // Remove default background
+              useRootNavigator: true,
+              isScrollControlled: true,
+              barrierColor: Colors.black54, // Darker overlay for better focus
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              builder: (context) => Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 20,
+                      spreadRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: 16,
+                    left: 16,
+                    right: 16,
+                    bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 48,
+                          height: 5,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8),
+                        child: Text(
+                          'Choose an Action',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.2,
+                            color: Colors.white
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      // Add Category Card (Neumorphic Style)
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15), // Ultra-smooth corners
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).primaryColor.withOpacity(0.9), // Vibrant primary
+                          Theme.of(context).primaryColorLight.withOpacity(0.7), // Softer secondary
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        stops: const [0.0, 1.0],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).primaryColor.withOpacity(0.2),
+                          blurRadius: 14,
+                          spreadRadius: 3,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(24),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(24),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showCategoryListDialog(context,);
+                            // _showCategoryDialog();
+                          },
+                          splashColor: Colors.white.withOpacity(0.2),
+                          highlightColor: Colors.white.withOpacity(0.1),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                            child: Row(
+                              children: [
+                                // Icon Container
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15), // Glassy effect
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 6,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Icon(
+                                    Icons.category_rounded,
+                                    color: Colors.white, // White icon for contrast
+                                    size: 28,
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                // Title
+                                Expanded(
+                                  child: Text(
+                                    'Add Category',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                      letterSpacing: 0.3,
+
+                                    ),
+
+                                  ),
+                                ),
+                                // Trailing Icon
+                                Icon(
+                                  Icons.chevron_right_rounded,
+                                  color: Colors.white.withOpacity(0.7),
+                                  size: 28,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                      Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15), // Ultra-smooth corners
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).primaryColor.withOpacity(0.9), // Vibrant primary
+                              Theme.of(context).primaryColorLight.withOpacity(0.7), // Softer secondary
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            stops: const [0.0, 1.0],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).primaryColor.withOpacity(0.2),
+                              blurRadius: 14,
+                              spreadRadius: 3,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(24),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(24),
+                              onTap: () async {
+                                // Navigator.pop(context);
+                                // _addExpenseDialog.show(context);
+
+                                Navigator.pop(context);
+                                final _addExpenseDialog = AddExpensesDialog();
+                                final result =  await _addExpenseDialog.show(context,
+                                  categoryExpenses,
+                                ); // Show dialog and wait for result
+                                if ( result) {
+                                  // Refresh the list if allowance was added successfully
+                                  await fetchExpenseData();
+                                }
+                                },
+                              splashColor: Colors.white.withOpacity(0.2),
+                              highlightColor: Colors.white.withOpacity(0.1),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                                child: Row(
+                                  children: [
+                                    // Icon Container
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.15), // Glassy effect
+                                        borderRadius: BorderRadius.circular(14),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withOpacity(0.1),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.money,
+                                        color: Colors.white, // White icon for contrast
+                                        size: 28,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 16),
+                                    // Title
+                                    Expanded(
+                                      child: Text(
+                                        'Add Expense',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                          letterSpacing: 0.3,
+
+                                        ),
+                                        // style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        //   fontSize: 17,
+                                        //   fontWeight: FontWeight.w600,
+                                        //   color: Colors.white, // White text for contrast
+                                        //   letterSpacing: 0.3,
+                                        // ),
+                                      ),
+                                    ),
+                                    // Trailing Icon
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: Colors.white.withOpacity(0.7),
+                                      size: 28,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Cancel Button (Outlined with slight transparency)
+
+                      SizedBox(
+                        height: 20.sp,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            side: BorderSide(
+                              color: Colors.grey.withOpacity(0.3),
+                            ),
+                            backgroundColor:HexColor('#1b2939'),
+                          ),
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+
 
           },
           style: ElevatedButton.styleFrom(
@@ -150,13 +1141,13 @@ class _ExpensesScreenState extends State<ExpensesScreen>
             mainAxisSize: MainAxisSize.min,
             children: [
               FaIcon(
-                FontAwesomeIcons.plus,
+                FontAwesomeIcons.plusCircle,
                 size: 18.sp,
                 color: Colors.white,
               ),
               SizedBox(width: 5.sp),
               Text(
-                'Add Expense',
+                'Add',
                 style: GoogleFonts.poppins(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w600,
@@ -378,6 +1369,16 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                           ),
                         ),
                       ),
+                      DataColumn(
+                        label: Text(
+                          'Actions',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w700,
+                            color: HexColor('#4B5563'),
+                          ),
+                        ),
+                      ),
                     ],
                     rows: List.generate(filteredExpenses.length, (index) {
                       final expense = filteredExpenses[index];
@@ -487,6 +1488,57 @@ class _ExpensesScreenState extends State<ExpensesScreen>
                               ),
                             ),
                           ),
+                          DataCell(
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit,
+                                      size: 20.sp, color: Colors.blue),
+                                  onPressed: () =>
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => CustomConfirmationDialog(
+                                          title: "Edit Expenses",
+                                          message: "Are you sure you want to save the changes?",
+                                          onConfirm: () async {
+                                            Navigator.pop(context);
+                                            final editExpenseDialog = EditExpensesDialog();
+                                            final result =  await editExpenseDialog.show(context,
+                                              expense['expancecat']['title'].toString(),
+                                              expense['entry_date'].toString(),
+                                              expense['amount'].toString(),
+                                              expense['remark'].toString(),
+                                              expense['id'].toString(),
+                                              categoryExpenses,
+                                            ); // Show dialog and wait for result
+                                            if ( result) {
+                                              // Refresh the list if allowance was added successfully
+                                              await fetchExpenseData();
+                                            }
+
+                                          },
+                                          onYes: () {
+                                            Navigator.pop(context);
+
+
+                                          },
+                                          onCancel: () {
+                                            Navigator.pop(context);
+                                          },
+                                        ),
+                                      ),
+                                ),
+
+                                IconButton(
+                                  icon: Icon(Icons.delete,
+                                      size: 20.sp, color: Colors.red),
+                                  onPressed: () => _showDeleteConfirmation(expense['id'].toString()),
+                                ),
+                              ],
+                            ),
+                          ),
+
                         ],
                       );
                     }),
@@ -501,6 +1553,271 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       ),
     );
   }
+  void _showDeleteConfirmation(String allowanceId) {
+    bool isDeleting = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_forever,
+                color: Colors.red,
+                size: 28,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Delete Expenses',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
+              'Are you sure you want to delete this Expenses? This action cannot be undone.',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                setState(() => isDeleting = true);
+                try {
+                  await deleteAllowance(allowanceId);
+                  Navigator.pop(context);
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text('Allowance deleted successfully'),
+                  //     backgroundColor: Colors.green,
+                  //   ),
+                  // );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete Expenses: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } finally {
+                  setState(() => isDeleting = false);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              child: isDeleting
+                  ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete, color: Colors.white, size: 18),
+                  SizedBox(width: 4),
+                  Text(
+                    'Delete',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Future<void> deleteAllowance(String allowanceId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('${ApiRoutes.deleteExpenses}/$allowanceId'), // Adjust endpoint
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Allowance deleted successfully')),
+      // );
+      fetchExpenseData(); // Refresh data
+    } else {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Failed to delete allowance')),
+      // );
+    }
+  }
+  Future<void> deleteCategory(String allowanceId,int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    final response = await http.post(
+      Uri.parse('${ApiRoutes.deleteCategory}/$allowanceId'), // Adjust endpoint
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        categoryExpenses.removeAt(index);
+      });      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Allowance deleted successfully')),
+      // );
+      fetchExpenseCategoryData(); // Refresh data
+    } else {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(content: Text('Failed to delete allowance')),
+      // );
+    }
+  }
+
+  void _showDeleteCategory(String allowanceId,int index) {
+    bool isDeleting = false;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          title: Row(
+            children: [
+              Icon(
+                Icons.delete_forever,
+                color: Colors.red,
+                size: 28,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Delete Category',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          content: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            child: Text(
+              'Are you sure you want to delete this Category? This action cannot be undone.',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: isDeleting ? null : () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: GoogleFonts.poppins(
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: isDeleting
+                  ? null
+                  : () async {
+                setState(() => isDeleting = true);
+                try {
+                  await deleteCategory(allowanceId,index);
+                  Navigator.pop(context);
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   SnackBar(
+                  //     content: Text('Allowance deleted successfully'),
+                  //     backgroundColor: Colors.green,
+                  //   ),
+                  // );
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete Expenses: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } finally {
+                  setState(() => isDeleting = false);
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              child: isDeleting
+                  ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete, color: Colors.white, size: 18),
+                  SizedBox(width: 4),
+                  Text(
+                    'Delete',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 }
 
 // Animated Loader
@@ -538,6 +1855,165 @@ class _AnimatedLoaderState extends State<AnimatedLoader>
         Icons.refresh,
         size: 40.sp,
         color: AppColors.bgYellow, // Replace with AppColors.bgYellow
+      ),
+    );
+  }
+}
+
+class CustomConfirmationDialog extends StatefulWidget {
+  final String title;
+  final String message;
+  final VoidCallback onConfirm;
+  final VoidCallback onYes;
+  final VoidCallback onCancel;
+
+  CustomConfirmationDialog({
+    required this.title,
+    required this.message,
+    required this.onConfirm,
+    required this.onYes,
+    required this.onCancel,
+  });
+
+  @override
+  _CustomConfirmationDialogState createState() => _CustomConfirmationDialogState();
+}
+
+class _CustomConfirmationDialogState extends State<CustomConfirmationDialog>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+    _scaleAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+      scale: _scaleAnimation,
+      child: Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 8,
+        backgroundColor: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title
+              Text(
+                widget.title,
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 10),
+              // Message
+              Text(
+                widget.message,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey[600],
+                ),
+              ),
+              SizedBox(height: 20),
+              // Buttons
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: widget.onCancel,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.redAccent, Colors.redAccent.shade100],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.greenAccent.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          "Cancel",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Confirm Button
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: widget.onConfirm,
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.blueAccent, Colors.blue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.blueAccent.withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          "YES",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

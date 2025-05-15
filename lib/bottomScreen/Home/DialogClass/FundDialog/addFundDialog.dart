@@ -487,7 +487,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../constants.dart';
 import '../../../../textSize.dart';
 
-class AddExpensesDialog {
+class AddFundDialog {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _percentageController = TextEditingController();
@@ -495,7 +495,7 @@ class AddExpensesDialog {
   final TextEditingController _remarkController = TextEditingController();
   Map<String, dynamic>? _selectedCategory; // Store the entire category object
   final _formKey = GlobalKey<FormState>();
-
+  String? _selectedTransactionType; // Add this to your state class
   // List to hold categories passed as parameter
   List _categoryExpenses = [];
   bool _isLoadingCategories = false;
@@ -559,7 +559,7 @@ class AddExpensesDialog {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Add Expense',
+                                'Add Fund',
                                 style: GoogleFonts.poppins(
                                   textStyle: Theme.of(context).textTheme.displayLarge,
                                   fontSize: TextSizes.text17,
@@ -587,7 +587,7 @@ class AddExpensesDialog {
                                         Padding(
                                           padding: EdgeInsets.only(left: 8.sp),
                                           child: Text(
-                                            'Expense Category',
+                                            'Select Employee',
                                             style: GoogleFonts.poppins(
                                               textStyle: Theme.of(context).textTheme.displayLarge,
                                               fontSize: TextSizes.text14,
@@ -610,7 +610,38 @@ class AddExpensesDialog {
                                     SizedBox(height: 5.sp),
                                     // Category Dropdown
                                     _buildCategoryDropdown(context, setState),
+                                    SizedBox(height: 20.sp),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 8.sp),
+                                          child: Text(
+                                            'Select Type',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: Theme.of(context).textTheme.displayLarge,
+                                              fontSize: TextSizes.text14,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.textblack,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: Theme.of(context).textTheme.displayLarge,
+                                            fontSize: TextSizes.text17,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.textblack,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5.sp),
+                                    // Category Dropdown
+                                    _buildTypeDropdown(context, setState),
                                     SizedBox(height: 25.sp),
+
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -773,7 +804,7 @@ class AddExpensesDialog {
                                         Padding(
                                           padding: EdgeInsets.only(left: 8.sp),
                                           child: Text(
-                                            'Remark',
+                                            'Description',
                                             style: GoogleFonts.poppins(
                                               textStyle: Theme.of(context).textTheme.displayLarge,
                                               fontSize: TextSizes.text14,
@@ -798,7 +829,7 @@ class AddExpensesDialog {
                                     TextFormField(
                                       controller: _remarkController,
                                       decoration: InputDecoration(
-                                        hintText: 'Enter Remarks',
+                                        hintText: 'Enter Description',
                                         labelStyle: GoogleFonts.poppins(
                                           textStyle: Theme.of(context).textTheme.displayLarge,
                                           fontSize: TextSizes.text15,
@@ -885,7 +916,7 @@ class AddExpensesDialog {
         ),
       ),
       hint: Text(
-        'Select Category',
+        'Select Employee',
         style: GoogleFonts.poppins(
           textStyle: Theme.of(context).textTheme.displayLarge,
           fontSize: TextSizes.text15,
@@ -896,7 +927,7 @@ class AddExpensesDialog {
       value: _selectedCategory,
       dropdownColor: Colors.white,
       items: _categoryExpenses.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
-        String title = category['title'].toString();
+        String title = category['name'].toString();
         return DropdownMenuItem<Map<String, dynamic>>(
           value: category, // Store the entire category object
           child: SizedBox(
@@ -924,7 +955,92 @@ class AddExpensesDialog {
       validator: (value) => value == null ? 'Please select a category' : null,
     );
   }
+  Widget _buildTypeDropdown(BuildContext context, StateSetter setState) {
+    if (_isLoadingCategories) {
+      return Center(child: CircularProgressIndicator());
+    }
 
+    if (_categoryExpenses.isEmpty) {
+      return Text(
+        'No categories available',
+        style: GoogleFonts.poppins(
+          fontSize: TextSizes.text14,
+          color: Colors.red,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Category Dropdown
+        // Transaction Type Dropdown (Credit/Debit)
+        DropdownButtonFormField<String>(
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: 20.sp,
+            color: AppColors.subTitleBlack,
+          ),
+          decoration: InputDecoration(
+            // labelText: 'Transaction Type',
+            // labelStyle: GoogleFonts.poppins(
+            //   textStyle: Theme.of(context).textTheme.displayLarge,
+            //   fontSize: TextSizes.text15,
+            //   fontWeight: FontWeight.w600,
+            //   color: AppColors.subTitleBlack,
+            // ),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 12.h,
+            ),
+          ),
+          hint: Text(
+            'Select Transaction Type',
+            style: GoogleFonts.poppins(
+              textStyle: Theme.of(context).textTheme.displayLarge,
+              fontSize: TextSizes.text15,
+              fontWeight: FontWeight.w500,
+              color: AppColors.subTitleBlack.withOpacity(0.6),
+            ),
+          ),
+          value: _selectedTransactionType,
+          dropdownColor: Colors.white,
+          items: ['Credit', 'Debit'].map<DropdownMenuItem<String>>((type) {
+            return DropdownMenuItem<String>(
+              value: type,
+              child: SizedBox(
+                height: 30.sp,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    type,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: TextSizes.text15,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.subTitleBlack,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedTransactionType = newValue;
+            });
+          },
+          validator: (value) => value == null ? 'Please select a transaction type' : null,
+        ),
+      ],
+    );
+  }
   Widget _buildUpdateButton(BuildContext context,) {
     return GestureDetector(
       onTap: () async {
@@ -940,7 +1056,7 @@ class AddExpensesDialog {
           );
 
           try {
-            bool success = await updateAllowance();
+            bool success = await addFund();
             Navigator.pop(context); // Close progress dialog
 
             if (success) {
@@ -987,7 +1103,7 @@ class AddExpensesDialog {
         ),
         child: Center(
           child: Text(
-            'Add Expenses',
+            'Add Fund',
             style: GoogleFonts.poppins(
               fontSize: TextSizes.text15,
               fontWeight: FontWeight.w600,
@@ -999,13 +1115,14 @@ class AddExpensesDialog {
     );
   }
 
-  Future<bool> updateAllowance() async {
+  Future<bool> addFund() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    var url = Uri.parse('${ApiRoutes.createExpenses}'); // Adjust endpoint
+    var url = Uri.parse(ApiRoutes.createFund); // Adjust endpoint
 
     Map<String, String> body = {
-      'category_id': _selectedCategory!['id'].toString(), // Use the ID from the selected category
+      'employee_id': _selectedCategory!['id'].toString(), // Use the ID from the selected category
+      'type': _selectedTransactionType.toString(), // Use the ID from the selected category
       'amount': _amountController.text,
       'description': _remarkController.text,
       'issue_date': _dateController.text,

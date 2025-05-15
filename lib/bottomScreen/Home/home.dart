@@ -18,6 +18,7 @@ import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
 import 'AllList/employee_list.dart';
+import 'AllList/fund_list.dart';
 import 'DialogClass/ExpensesDialog/addExpenseDialog.dart';
 import 'DialogClass/AllowanceDialog/addAllowanceDialog.dart';
 import 'DialogClass/createSalleryDialog.dart';
@@ -995,7 +996,11 @@ class _BottomCardState extends State<BottomCard> {
                     );
 
                   }else if(item['amount']=='Manage Fund'){
-                    _manageFundDialog.show(context);
+                    PersistentNavBarNavigator.pushNewScreen(
+                      context,
+                      screen: EmployeeFundScreen(),
+                    );
+                    // _manageFundDialog.show(context);
 
                   }
 

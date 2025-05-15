@@ -84,5 +84,22 @@ class ApiRoutes {
 
   static const String getCategoryListExpanse = "$baseUrl/admin/category-list";
   static const String createExpenses = "$baseUrl/admin/expance-create";
+  static const String createCategoryExpenses = "$baseUrl/admin/category-create";
+  static const String deleteExpenses = "$baseUrl/admin/expance-delete";
+  static const String deleteCategory = "$baseUrl/admin/category-delete";
+  static const String updateExpenses = "$baseUrl/admin/expance-update";
+  static const String updateCategory = "$baseUrl/admin/category-update";
+
+
+  static const String getFundList = "$baseUrl/admin/fund-list";
+  static const String deleteFund = "$baseUrl/admin/fund-delete";
+  static const String createFund = "$baseUrl/admin/fund-create";
+
+
+
+
+
+
+
   static const String notifications = "$baseUrl/notifications";
 }
