@@ -115,6 +115,13 @@ class _EmployeeScreenState extends State<EmployeeScreen>
     super.dispose();
   }
 
+  void _refresh() {
+    setState(() {
+      fetchEmployeeData();
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +135,7 @@ class _EmployeeScreenState extends State<EmployeeScreen>
             onPressed: () {
               PersistentNavBarNavigator.pushNewScreen(
                 context,
-                screen: AddEmployee(menuScreenContext: context),
+                screen: AddEmployee(menuScreenContext: context, onReturn: _refresh,),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -286,13 +293,24 @@ class _EmployeeScreenState extends State<EmployeeScreen>
               SizedBox(height: 20.sp),
               FadeTransition(
                 opacity: _fadeAnimation,
-                child: Text(
-                  'EMPLOYEE LIST (${filteredFees.length})',
-                  style: GoogleFonts.poppins(
-                    fontSize: TextSizes.text12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textblack,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                  children: [
+                    Text(
+                      'EMPLOYEE LIST (${filteredFees.length})',
+                      style: GoogleFonts.poppins(
+                        fontSize: TextSizes.text12,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textblack,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh,
+                          size: 24.sp, color: Colors.grey[700]),
+                      onPressed: fetchEmployeeData,
+                    )
+                  ],
                 ),
               ),
               SizedBox(height: 10.sp),
@@ -318,10 +336,10 @@ class _EmployeeScreenState extends State<EmployeeScreen>
                                 .split(' ')
                                 .map((e) => e[0])
                                 .join(),
-                            name: employee['name'],
-                            base: employee['email'],
-                            incentive: employee['joining_date'],
-                            total: employee['joining_date'],
+                            name: employee['name']??'',
+                            base: employee['email']??'',
+                            incentive: employee['joining_date']??'',
+                            total: employee['joining_date']??'',
                             status: employee['status'].toString(),
                             avatarColor:
                             avatarColors[index % avatarColors.length],

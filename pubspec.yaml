@@ -35,7 +35,8 @@ dependencies:
   overlay_loader_with_app_icon: ^0.0.4
   shared_preferences: ^2.2.3
   animate_do: ^3.3.4
-  url_launcher: ^6.0.20 # Use the latest version
+  url_launcher: ^6.0.20
+  file_picker: ^6.1.1
 
 
 

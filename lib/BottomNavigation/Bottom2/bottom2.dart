@@ -10,11 +10,13 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Auth/login_screen.dart';
 import '../../HexColorCode/HexColor.dart';
+import '../../bottomScreen/Allotment/allotment.dart';
 import '../../bottomScreen/Home/AllList/expenses_list.dart';
 import '../../bottomScreen/Home/AllList/sallery_list.dart';
 import '../../bottomScreen/Home/home.dart';
 import '../../bottomScreen/Profile/profile.dart';
 import '../../constants.dart';
+import '../../demo.dart';
 import '../../textSize.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -57,16 +59,15 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     }
     super.dispose();
   }
+
   void getName() async {
     final prefs = await SharedPreferences.getInstance();
 
     setState(() {
       username = prefs.getString('username');
-
     });
     print(username);
   }
-
 
   Future<void> logoutApi(BuildContext context) async {
     showDialog(
@@ -98,10 +99,11 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
 
       final response = await http.post(uri, headers: headers);
 
-
       if (response.statusCode == 200) {
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.remove('isLoggedIn',);
+        prefs.remove(
+          'isLoggedIn',
+        );
 
         // If the server returns a 200 OK response, parse the data
         Navigator.pushReplacement(
@@ -130,21 +132,23 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
 
   List<Widget> _buildScreens() => [
         HomeScreen(),
+        AllotmentPage(),
+        SalaryScreen(),
+        ExpensesScreen(),
+        ProfileScreen(),
 
-        MainScreen(
-          menuScreenContext: widget.menuScreenContext,
-          hideStatus: _hideNavBar,
-          onScreenHideButtonPressed: () {
-            setState(() {
-              _hideNavBar = !_hideNavBar;
-            });
-          },
-          onNavBarStyleChanged: (final value) =>
-              setState(() => _navBarStyle = value),
-        ),
-    SalaryScreen(),
-    ExpensesScreen(),
-    ProfileScreen(),
+
+    // MainScreen(
+    //   menuScreenContext: widget.menuScreenContext,
+    //   hideStatus: _hideNavBar,
+    //   onScreenHideButtonPressed: () {
+    //     setState(() {
+    //       _hideNavBar = !_hideNavBar;
+    //     });
+    //   },
+    //   onNavBarStyleChanged: (final value) =>
+    //       setState(() => _navBarStyle = value),
+    // ),
       ];
 
   Color? _getSecondaryItemColorForSpecificStyles() =>
@@ -284,7 +288,8 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                 builder: (context) => GestureDetector(
                   onTap: () => Scaffold.of(context).openDrawer(),
                   child: Container(
-                    width: 40.sp, // Equal width and height for perfect circle
+                    width: 40.sp,
+                    // Equal width and height for perfect circle
                     height: 40.sp,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -297,7 +302,8 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         ),
                       ],
                     ),
-                    child: Center( // Center the icon for better alignment
+                    child: Center(
+                      // Center the icon for better alignment
                       child: Icon(
                         Icons.menu_rounded,
                         size: 20.sp,
@@ -337,15 +343,15 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
           // Notification Button
           GestureDetector(
             onTap: () {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) {
-              //       return SalaryHomePage();
-              //     },
-              //   ),
-              // );
-              },
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) {
+                    return LoanPage();
+                  },
+                ),
+              );
+            },
             child: Container(
               width: 40.sp, // Equal width and height for perfect circle
               height: 40.sp,
@@ -395,6 +401,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     // final packageInfo = await PackageInfo.fromPlatform();
@@ -420,9 +427,10 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                     _buildDrawerHeader(),
                     Padding(
                       padding: EdgeInsets.only(
-                          left: TextSizes.padding11,
-                          right: TextSizes.padding15,
-                          top: 25.sp,),
+                        left: TextSizes.padding11,
+                        right: TextSizes.padding15,
+                        top: 25.sp,
+                      ),
                       child: Row(
                         children: [
                           FaIcon(FontAwesomeIcons.home, size: 16.sp),
@@ -494,7 +502,6 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         _buildSubItem(context, 'Add Expense', '/expense/add'),
                       ],
                     ),
-
                     Padding(
                       padding: EdgeInsets.only(
                           left: TextSizes.padding11,
@@ -520,15 +527,14 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                     ),
                     ListTile(
                       leading: Icon(Icons.logout, color: Colors.black),
-                      title: Text("Logout", style: TextStyle(color: Colors.black)),
+                      title:
+                          Text("Logout", style: TextStyle(color: Colors.black)),
                       onTap: () {
                         Navigator.pop(context); // Close the progress dialog
 
                         logoutApi(context);
                       },
                     ),
-
-
                   ],
                 ),
               ),
@@ -760,7 +766,7 @@ Widget _buildExpansionItem({
 
 Widget _buildSubItem(BuildContext context, String title, String routeName) {
   return Padding(
-    padding:  EdgeInsets.only(left: 16.sp,bottom: 15.sp),
+    padding: EdgeInsets.only(left: 16.sp, bottom: 15.sp),
     child: InkWell(
       borderRadius: BorderRadius.circular(16),
       splashColor: Colors.black.withOpacity(0.1),

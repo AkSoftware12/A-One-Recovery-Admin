@@ -16,6 +16,7 @@ class EditFundDialog {
   final TextEditingController _remarkController = TextEditingController();
   Map<String, dynamic>? _selectedCategory; // Store the entire category object
   final _formKey = GlobalKey<FormState>();
+  String? _selectedTransactionType; // Add this to your state class
 
   // List to hold categories passed as parameter
   List _categoryExpenses = [];
@@ -24,6 +25,7 @@ class EditFundDialog {
   Future<bool> show(
       BuildContext context,
       String categoryName,
+      String type,
       String entryDate,
       String amount,
       String remark,
@@ -40,9 +42,11 @@ class EditFundDialog {
 
     // Find the category object that matches the provided categoryName
     _selectedCategory = _categoryExpenses.firstWhere(
-          (category) => category['title'] == categoryName,
+          (category) => category['name'] == categoryName,
       orElse: () => null,
     );
+    _selectedTransactionType = ['credit', 'debit'].contains(type.toLowerCase()) ? type.toLowerCase() : null;
+
 
     return await showGeneralDialog<bool>(
       context: context,
@@ -87,7 +91,7 @@ class EditFundDialog {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Edit Expense',
+                                'Edit Fund',
                                 style: GoogleFonts.poppins(
                                   textStyle: Theme.of(context).textTheme.displayLarge,
                                   fontSize: TextSizes.text17,
@@ -115,7 +119,7 @@ class EditFundDialog {
                                         Padding(
                                           padding: EdgeInsets.only(left: 8.sp),
                                           child: Text(
-                                            'Expense Category',
+                                            'Select Employee',
                                             style: GoogleFonts.poppins(
                                               textStyle: Theme.of(context).textTheme.displayLarge,
                                               fontSize: TextSizes.text14,
@@ -138,7 +142,38 @@ class EditFundDialog {
                                     SizedBox(height: 5.sp),
                                     // Category Dropdown
                                     _buildCategoryDropdown(context, setState),
+                                    SizedBox(height: 20.sp),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 8.sp),
+                                          child: Text(
+                                            'Select Type',
+                                            style: GoogleFonts.poppins(
+                                              textStyle: Theme.of(context).textTheme.displayLarge,
+                                              fontSize: TextSizes.text14,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.textblack,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          '',
+                                          style: GoogleFonts.poppins(
+                                            textStyle: Theme.of(context).textTheme.displayLarge,
+                                            fontSize: TextSizes.text17,
+                                            fontWeight: FontWeight.w800,
+                                            color: AppColors.textblack,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5.sp),
+                                    // Category Dropdown
+                                    _buildTypeDropdown(context, setState),
                                     SizedBox(height: 25.sp),
+
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
@@ -301,7 +336,7 @@ class EditFundDialog {
                                         Padding(
                                           padding: EdgeInsets.only(left: 8.sp),
                                           child: Text(
-                                            'Remark',
+                                            'Description',
                                             style: GoogleFonts.poppins(
                                               textStyle: Theme.of(context).textTheme.displayLarge,
                                               fontSize: TextSizes.text14,
@@ -326,7 +361,7 @@ class EditFundDialog {
                                     TextFormField(
                                       controller: _remarkController,
                                       decoration: InputDecoration(
-                                        hintText: 'Enter Remarks',
+                                        hintText: 'Enter Description',
                                         labelStyle: GoogleFonts.poppins(
                                           textStyle: Theme.of(context).textTheme.displayLarge,
                                           fontSize: TextSizes.text15,
@@ -424,7 +459,7 @@ class EditFundDialog {
       value: _selectedCategory,
       dropdownColor: Colors.white,
       items: _categoryExpenses.map<DropdownMenuItem<Map<String, dynamic>>>((category) {
-        String title = category['title'].toString();
+        String title = category['name'].toString();
         return DropdownMenuItem<Map<String, dynamic>>(
           value: category, // Store the entire category object
           child: SizedBox(
@@ -450,6 +485,94 @@ class EditFundDialog {
         });
       },
       validator: (value) => value == null ? 'Please select a category' : null,
+    );
+  }
+  Widget _buildTypeDropdown(BuildContext context, StateSetter dialogSetState) {
+    if (_isLoadingCategories) {
+      return Center(child: CircularProgressIndicator());
+    }
+
+    if (_categoryExpenses.isEmpty) {
+      return Text(
+        'No categories available',
+        style: GoogleFonts.poppins(
+          fontSize: TextSizes.text14,
+          color: Colors.red,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Category Dropdown
+        // Transaction Type Dropdown (Credit/Debit)
+        DropdownButtonFormField<String>(
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: 20.sp,
+            color: AppColors.subTitleBlack,
+          ),
+          decoration: InputDecoration(
+            // labelText: 'Transaction Type',
+            // labelStyle: GoogleFonts.poppins(
+            //   textStyle: Theme.of(context).textTheme.displayLarge,
+            //   fontSize: TextSizes.text15,
+            //   fontWeight: FontWeight.w600,
+            //   color: AppColors.subTitleBlack,
+            // ),
+            filled: true,
+            fillColor: Colors.grey[100],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 12.h,
+            ),
+          ),
+          hint: Text(
+            'Select Transaction Type',
+            style: GoogleFonts.poppins(
+              textStyle: Theme.of(context).textTheme.displayLarge,
+              fontSize: TextSizes.text15,
+              fontWeight: FontWeight.w500,
+              color: AppColors.subTitleBlack.withOpacity(0.6),
+            ),
+          ),
+          value: _selectedTransactionType,
+          dropdownColor: Colors.white,
+          items: ['credit', 'debit'].map<DropdownMenuItem<String>>((type) {
+            return DropdownMenuItem<String>(
+              value: type,
+              child: SizedBox(
+                height: 30.sp,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    type,
+                    style: GoogleFonts.poppins(
+                      textStyle: Theme.of(context).textTheme.displayLarge,
+                      fontSize: TextSizes.text15,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.subTitleBlack,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            dialogSetState(() {
+              _selectedTransactionType = newValue;
+              print('Selected Type: $_selectedTransactionType'); // Debug print
+            });
+
+          },
+          validator: (value) => value == null ? 'Please select a transaction type' : null,
+        ),
+      ],
     );
   }
 
@@ -515,7 +638,7 @@ class EditFundDialog {
         ),
         child: Center(
           child: Text(
-            'Update Expenses',
+            'Update Fund',
             style: GoogleFonts.poppins(
               fontSize: TextSizes.text15,
               fontWeight: FontWeight.w600,
@@ -530,10 +653,11 @@ class EditFundDialog {
   Future<bool> updateAllowance(String allowance) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    var url = Uri.parse('${ApiRoutes.updateExpenses}/$allowance'); // Adjust endpoint
+    var url = Uri.parse('${ApiRoutes.updateFund}/$allowance'); // Adjust endpoint
 
     Map<String, String> body = {
-      'category_id': _selectedCategory!['id'].toString(), // Use the ID from the selected category
+      'employee_id': _selectedCategory!['id'].toString(), // Use the ID from the selected category
+      'type': _selectedTransactionType.toString(),
       'amount': _amountController.text,
       'description': _remarkController.text,
       'issue_date': _dateController.text,

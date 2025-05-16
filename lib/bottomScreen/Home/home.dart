@@ -2,8 +2,6 @@ import 'package:aoneadmin/bottomScreen/Home/AllList/deducation_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/expenses_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/allowances_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/sallery_list.dart';
-import 'package:aoneadmin/bottomScreen/Home/EmployeeDeductionDialog/employeeDeductionDialog.dart';
-import 'package:aoneadmin/bottomScreen/Home/DialogClass/manageFundDialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,9 +17,7 @@ import '../../strings.dart';
 import '../../textSize.dart';
 import 'AllList/employee_list.dart';
 import 'AllList/fund_list.dart';
-import 'DialogClass/ExpensesDialog/addExpenseDialog.dart';
-import 'DialogClass/AllowanceDialog/addAllowanceDialog.dart';
-import 'DialogClass/createSalleryDialog.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -790,10 +786,7 @@ class BottomCard extends StatefulWidget {
 }
 
 class _BottomCardState extends State<BottomCard> {
-  final AllowanceDialog _allowanceDialog = AllowanceDialog();
-  final CreateSalleryDialog _createSalleryDialog = CreateSalleryDialog();
-  final DeductionDialog _deductionDialog = DeductionDialog();
-  final ManageFundDialog _manageFundDialog = ManageFundDialog();
+
 
   List<Map<String, dynamic>> items = [
     {

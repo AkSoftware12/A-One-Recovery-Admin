@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:aoneadmin/constants.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,13 +10,16 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../textSize.dart';
 
 
 
 class AddEmployee extends StatefulWidget {
-  const AddEmployee({super.key, required BuildContext menuScreenContext});
+  final VoidCallback onReturn;
+
+  const AddEmployee({super.key, required BuildContext menuScreenContext, required this.onReturn});
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -28,6 +32,13 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
   final _purposeFormKey = GlobalKey<FormState>();
   AnimationController? _animationController;
   Animation<double>? _animation;
+  bool _isLoading = false;
+
+  String? _selectedOption; // Holds the selected dropdown value ("Permanent" or "Contract")
+  int? _selectedValue;
+
+  String? _selectedOption2; // Holds the selected dropdown value ("Permanent" or "Contract")
+  int? _selectedValue2;
 
   // Personal info controllers
   final _firstNameController = TextEditingController();
@@ -549,16 +560,10 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
                   Fluttertoast.showToast(msg: "Please enter your name",backgroundColor: Colors.red,textColor: Colors.white,  gravity: ToastGravity.CENTER,
                   );
                 }
-               else if (emailController.text.isEmpty) {
-                  // Show email validation error as toast
-                  Fluttertoast.showToast(msg: "Please enter your email",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
-                }
+
                else if (contactController.text.isEmpty) {
                   // Show contact validation error as toast
                   Fluttertoast.showToast(msg: "Please enter your contact number",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
-                }else if (dobController.text.isEmpty) {
-                  // Show email validation error as toast
-                  Fluttertoast.showToast(msg: "Please enter your Dob Brith",backgroundColor: Colors.red,textColor: Colors.white, gravity: ToastGravity.CENTER,);
                 }
 
                else {
@@ -747,12 +752,12 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
 
 
           buildLabel("Contract Type", fontSize),
-          buildDropdown(
-            items: ["Permanent", "Contract"],
-            onChanged: (value) => setState(() => contractType = value),
-            value: contractType,
-            fontSize: fontSize,
-            icon: Icons.work_outline,
+          buildDropdown2(
+            items: ["Permanent", "Contract"], // Dropdown options
+            onChanged: _handleDropdownChange, // Callback to handle selection
+            value: _selectedOption, // Current selected option
+            fontSize: 16.0, // Font size for dropdown
+            icon: Icons.work, // Icon for dropdown
           ),
 
           buildLabel("Blood Group", fontSize),
@@ -775,10 +780,11 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
 
 
           buildLabel("Employee Type", fontSize),
-          buildDropdown(
-              items: ["Full-time", "Part-time", "Contract", "Intern", "Freelancer"],
-            onChanged: (value) => setState(() => employeetype = value),
-            value: employeetype,
+          buildDropdown2(
+              items: ["Fos", "Office",],
+            onChanged: _handleDropdownChange2, // Callback to handle selection
+            // onChanged: (value) => setState(() => employeetype = value),
+            value: _selectedOption2,
             fontSize: fontSize,
             icon: Icons.person,
           ),
@@ -806,24 +812,88 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
                     backgroundColor: Colors.indigo,
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  onPressed: () {
-                    _buildNextButton(() {
-                      _navigateToStep(4);
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                    if (_selectedValue == null) {
+                      Fluttertoast.showToast(
+                        msg: "Please enter Contract Type",
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        gravity: ToastGravity.CENTER,
+                      );
+                    } else if (_selectedValue2 == null) {
+                      Fluttertoast.showToast(
+                        msg: "Please enter your Employee type",
+                        backgroundColor: Colors.red,
+                        textColor: Colors.white,
+                        gravity: ToastGravity.CENTER,
+                      );
+                    } else {
+                      setState(() {
+                        _isLoading = true;
+                      });
 
-                    });
+                      try {
+                        final response = await hitApi();
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+
+                        // if (response.statusCode == 200) {
+                        //   // _navigateToStep(4);
+                        //   Fluttertoast.showToast(
+                        //     msg: "Success!",
+                        //     backgroundColor: Colors.green,
+                        //     textColor: Colors.white,
+                        //     gravity: ToastGravity.CENTER,
+                        //   );
+                        // } else {
+                        //   Fluttertoast.showToast(
+                        //     msg: "API Error: ${response.statusCode}",
+                        //     backgroundColor: Colors.red,
+                        //     textColor: Colors.white,
+                        //     gravity: ToastGravity.CENTER,
+                        //   );
+                        // }
+                      } catch (e) {
+                        if (mounted) {
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                        Fluttertoast.showToast(
+                          msg: "Error: $e",
+                          backgroundColor: Colors.red,
+                          textColor: Colors.white,
+                          gravity: ToastGravity.CENTER,
+                        );
+                      }
+                    }
                   },
-                  icon: Icon(Icons.check_circle, color: Colors.white),
+                  icon: _isLoading
+                      ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : Icon(Icons.check_circle, color: Colors.white),
                   label: Text(
-                    "Submit",
+                    _isLoading ? "Submitting..." : "Submit",
                     style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-              ),
-            ],
+              )
+                ],
           ),
 
           SizedBox(height: 80),
@@ -831,6 +901,89 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
         ],
       ),
     );
+  }
+  Future<void> hitApi() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    // Prepare data
+    Map<String, dynamic> data = {
+      'name': nameController.text,
+      'email': emailController.text,
+      'state': stateController.text,
+      'district': districtController.text,
+      'pin': pinController.text,
+      'address': addressController.text,
+      'contact': contactController.text,
+      'dob': dobController.text,
+      'bank_account_no': bankAccountNoController.text,
+      'ifsc_code': ifscController.text,
+      'joining_date': joiningDateController.text,
+      'employee_type': _selectedValue2,
+      'contract_type': _selectedValue,
+      'religion': religion,
+      'social_category': socialCategory,
+      'blood_group': bloodGroup,
+      'adhar_card_no': '7894531456',
+      'pan_card_no': '456saf5656',
+      'gender': gender,
+      'basic_pay': basicPayController.text,
+    };
+
+    try {
+      // Make API request
+      final response = await http.post(
+        Uri.parse(ApiRoutes.employeeCreate),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Handle response
+      print('Response: ${response.body}');
+      if (response.statusCode == 200) {
+        widget.onReturn();
+        Navigator.of(context).pop();
+        print('API call successful');
+        // _showSuccessDialog();
+      } else {
+        Fluttertoast.showToast(
+            msg: "${response.statusCode}",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+        print('API call failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      Fluttertoast.showToast(
+          msg: "$e",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+      print('Error: $e');
+    }
   }
 
   Widget _buildDocumentsStep() {
@@ -1214,8 +1367,85 @@ class _RegistrationPageState extends State<AddEmployee> with SingleTickerProvide
       validator: (value) => value == null ? "Please select an option" : null,
     );
   }
+
+  void _handleDropdownChange(String? newValue) {
+    setState(() {
+      _selectedOption = newValue;
+      if (newValue == "Permanent") {
+        _selectedValue = 1;
+      } else if (newValue == "Contract") {
+        _selectedValue = 2;
+      } else {
+        _selectedValue = null; // Handle null case if needed
+      }
+      print("Selected Option: $_selectedOption, Value: $_selectedValue");
+    });
+  }
+
+  void _handleDropdownChange2(String? newValue) {
+    setState(() {
+      _selectedOption2 = newValue;
+      if (newValue == "Fos") {
+        _selectedValue2 = 1;
+      } else if (newValue == "Office") {
+        _selectedValue2 = 2;
+      } else {
+        _selectedValue2 = null; // Handle null case if needed
+      }
+      print("Selected Option: $_selectedOption2, Value: $_selectedValue2");
+    });
+  }
+
+  // The provided buildDropdown2 widget
+  Widget buildDropdown2({
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+    required String? value,
+    required double fontSize,
+    required IconData icon,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: InputDecoration(
+        prefixIcon: Icon(icon, color: Colors.indigo),
+        hintStyle: TextStyle(fontSize: fontSize, color: Colors.grey[400]),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.redAccent, width: 2),
+        ),
+      ),
+      hint: Text("Select", style: TextStyle(fontSize: fontSize)),
+      onChanged: onChanged,
+      items: items
+          .map((item) => DropdownMenuItem(
+        value: item,
+        child: Text(item, style: TextStyle(fontSize: fontSize)),
+      ))
+          .toList(),
+      validator: (value) => value == null ? "Please select an option" : null,
+    );
+  }
 }
 
 
 
 
+class LoadingDialog {
+  static void show(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(
+        child: CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  static void hide(BuildContext context) {
+    Navigator.of(context).pop();
+  }
+}

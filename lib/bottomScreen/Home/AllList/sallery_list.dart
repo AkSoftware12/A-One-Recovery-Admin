@@ -1,14 +1,11 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:animate_do/animate_do.dart';
-import 'package:aoneadmin/HexColorCode/HexColor.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../DialogClass/ExpensesDialog/addExpenseDialog.dart'; // Adjust path as needed
 import '../../../constants.dart'; // Adjust path as needed
 import '../../../textSize.dart'; // Adjust path as needed
 import 'package:url_launcher/url_launcher.dart';
@@ -22,7 +19,6 @@ class SalaryScreen extends StatefulWidget {
 
 class _ExpensesScreenState extends State<SalaryScreen>
     with SingleTickerProviderStateMixin {
-  final AddExpensesDialog _addExpenseDialog = AddExpensesDialog();
   bool isLoading = false;
   List Salary = [];
   List filteredExpenses = [];
@@ -45,7 +41,6 @@ class _ExpensesScreenState extends State<SalaryScreen>
     searchController.addListener(_filterExpenses);
     _animationController.forward();
   }
-
 
   Future<void> fetchExpenseData() async {
     setState(() {
@@ -101,6 +96,12 @@ class _ExpensesScreenState extends State<SalaryScreen>
     super.dispose();
   }
 
+  void _refresh() {
+    setState(() {
+      fetchExpenseData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,7 +112,9 @@ class _ExpensesScreenState extends State<SalaryScreen>
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => const SalaryDialog(),
+              builder: (context) => SalaryDialog(
+                onReturn: _refresh,
+              ),
             );
           },
           style: ElevatedButton.styleFrom(
@@ -151,7 +154,7 @@ class _ExpensesScreenState extends State<SalaryScreen>
           children: [
             // Search Bar
             Padding(
-              padding:  EdgeInsets.all(5.sp),
+              padding: EdgeInsets.all(5.sp),
               child: TextField(
                 controller: searchController,
                 decoration: InputDecoration(
@@ -168,13 +171,13 @@ class _ExpensesScreenState extends State<SalaryScreen>
                   ),
                   suffixIcon: searchController.text.isNotEmpty
                       ? IconButton(
-                    icon: Icon(Icons.clear,
-                        color: Colors.grey[600], size: 22.sp),
-                    onPressed: () {
-                      searchController.clear();
-                      _filterExpenses();
-                    },
-                  )
+                          icon: Icon(Icons.clear,
+                              color: Colors.grey[600], size: 22.sp),
+                          onPressed: () {
+                            searchController.clear();
+                            _filterExpenses();
+                          },
+                        )
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
@@ -182,19 +185,21 @@ class _ExpensesScreenState extends State<SalaryScreen>
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide(color: Colors.grey[300]!, width: 1.5),
+                    borderSide:
+                        BorderSide(color: Colors.grey[300]!, width: 1.5),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide(
-                      color: AppColors.bgYellow, // Replace with AppColors.bgYellow
+                      color: AppColors.bgYellow,
+                      // Replace with AppColors.bgYellow
                       width: 2,
                     ),
                   ),
                   filled: true,
                   fillColor: Colors.white,
                   contentPadding:
-                  EdgeInsets.symmetric(vertical: 14.sp, horizontal: 16.sp),
+                      EdgeInsets.symmetric(vertical: 14.sp, horizontal: 16.sp),
                 ),
                 style: GoogleFonts.poppins(
                   fontSize: 14.sp,
@@ -207,7 +212,7 @@ class _ExpensesScreenState extends State<SalaryScreen>
             FadeTransition(
               opacity: _fadeAnimation,
               child: Padding(
-                padding:  EdgeInsets.all(8.sp),
+                padding: EdgeInsets.all(8.sp),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -220,7 +225,8 @@ class _ExpensesScreenState extends State<SalaryScreen>
                       ),
                     ),
                     IconButton(
-                      icon: Icon(Icons.refresh, size: 24.sp, color: Colors.grey[700]),
+                      icon: Icon(Icons.refresh,
+                          size: 24.sp, color: Colors.grey[700]),
                       onPressed: fetchExpenseData,
                     ),
                   ],
@@ -233,36 +239,42 @@ class _ExpensesScreenState extends State<SalaryScreen>
               child: isLoading
                   ? const Center(child: AnimatedLoader())
                   : ListView.builder(
-                padding: const EdgeInsets.all(12.0),
-                itemCount: filteredExpenses.length,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  final salary = filteredExpenses[index];
-                  return FadeInUp(
-                    duration: Duration(milliseconds: 300 + (index * 100)),
-                    child: _buildSalaryCard(context,
-                      salary['unique_id'].toString(),
-                      salary['month'].toString(),
-                      salary['basic_salary'].toString(),
-                      salary['total_allowance'].toString(),
-                      salary['total_deduction'].toString(),
-                      salary['net_salary'].toString(),
+                      padding: const EdgeInsets.all(12.0),
+                      itemCount: filteredExpenses.length,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        final salary = filteredExpenses[index];
+                        return FadeInUp(
+                          duration: Duration(milliseconds: 300 + (index * 100)),
+                          child: _buildSalaryCard(
+                            context,
+                            salary['unique_id'].toString(),
+                            salary['month'].toString(),
+                            salary['basic_salary'].toString(),
+                            salary['total_allowance'].toString(),
+                            salary['total_deduction'].toString(),
+                            salary['net_salary'].toString(),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
             // SizedBox(height: 50.sp),
-
           ],
         ),
       ),
     );
   }
-  Widget _buildSalaryCard(BuildContext context,
-  String name,String month,
-  String basic, String allowance, String deduction, String netSalary,
-      ) {
+
+  Widget _buildSalaryCard(
+    BuildContext context,
+    String name,
+    String month,
+    String basic,
+    String allowance,
+    String deduction,
+    String netSalary,
+  ) {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -293,13 +305,13 @@ class _ExpensesScreenState extends State<SalaryScreen>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
             gradient: LinearGradient(
-              colors:  [Colors.white, Colors.teal[50]!],
+              colors: [Colors.white, Colors.teal[50]!],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             boxShadow: [
               BoxShadow(
-                color:  Colors.teal.withOpacity(0.1),
+                color: Colors.teal.withOpacity(0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -331,19 +343,31 @@ class _ExpensesScreenState extends State<SalaryScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        name,
-                        style: GoogleFonts.poppins(
-                          fontSize: 15.0,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                      MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.noScaling,
+                        ),
+                        child: Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                      Text(
-                        'Month: ${month}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 11.0,
-                          color: Colors.grey[600],
+                      MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.noScaling,
+                        ),
+                        child: Text(
+                          'Month: ${month}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       const SizedBox(height: 4.0),
@@ -368,12 +392,17 @@ class _ExpensesScreenState extends State<SalaryScreen>
                         ],
                       ),
                       const SizedBox(height: 4.0),
-                      Text(
-                        'Net: ₹${netSalary}',
-                        style: GoogleFonts.poppins(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.w600,
-                          color:  Colors.teal[600],
+                      MediaQuery(
+                        data: MediaQuery.of(context).copyWith(
+                          textScaler: TextScaler.noScaling,
+                        ),
+                        child: Text(
+                          'Net: ₹${netSalary}',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.teal[600],
+                          ),
                         ),
                       ),
                     ],
@@ -434,28 +463,30 @@ class _ExpensesScreenState extends State<SalaryScreen>
   }
 
   Widget _buildDetailColumn(String label, String value, Color valueColor) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 9.0,
-            color:  Colors.grey[600],
-          ),
+    return MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: TextScaler.noScaling,
         ),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 11.0,
-            fontWeight: FontWeight.w500,
-            color: valueColor,
-          ),
-        ),
-      ],
-    );
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 12,
+                color: valueColor,
+              ),
+            ),
+          ],
+        ));
   }
-
 }
 
 // Animated Loader
@@ -498,9 +529,10 @@ class _AnimatedLoaderState extends State<AnimatedLoader>
   }
 }
 
-
 class SalaryDialog extends StatefulWidget {
-  const SalaryDialog({super.key});
+  final VoidCallback onReturn;
+
+  const SalaryDialog({super.key, required this.onReturn});
 
   @override
   State<SalaryDialog> createState() => _SalaryDialogState();
@@ -510,9 +542,10 @@ class _SalaryDialogState extends State<SalaryDialog> {
   String? selectedYear;
   String? selectedMonth;
   String generatedSalary = '';
+  bool _isLoading = false; // State to track loading
 
-  final List<String> years = List.generate(
-      10, (index) => (DateTime.now().year - index).toString());
+  final List<String> years =
+      List.generate(10, (index) => (DateTime.now().year - index).toString());
   final List<String> months = [
     'January',
     'February',
@@ -537,6 +570,9 @@ class _SalaryDialogState extends State<SalaryDialog> {
   }
 
   void generateSalary() async {
+    setState(() {
+      _isLoading = true; // Show progress bar
+    });
 
     if (selectedYear != null && selectedMonth != null) {
       try {
@@ -559,17 +595,22 @@ class _SalaryDialogState extends State<SalaryDialog> {
           final data = jsonDecode(response.body);
           final salary = data['salary']; // Adjust based on your API response
           setState(() {
+            widget.onReturn();
+            Navigator.of(context).pop();
             generatedSalary =
-            'Salary for $selectedMonth $selectedYear: ₹$salary';
+                'Salary for $selectedMonth $selectedYear: ₹$salary';
+            _isLoading = false; // Hide progress bar
           });
         } else {
           setState(() {
             generatedSalary = 'Error fetching salary: ${response.statusCode}';
+            _isLoading = false; // Hide progress bar
           });
         }
       } catch (e) {
         setState(() {
           generatedSalary = 'Error: $e';
+          _isLoading = false; // Hide progress bar
         });
       }
     } else {
@@ -578,6 +619,7 @@ class _SalaryDialogState extends State<SalaryDialog> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -632,7 +674,8 @@ class _SalaryDialogState extends State<SalaryDialog> {
                   color: Colors.black87,
                   fontSize: 16,
                 ),
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
+                icon:
+                    const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
                 items: years.map((String year) {
                   return DropdownMenuItem<String>(
                     value: year,
@@ -669,7 +712,8 @@ class _SalaryDialogState extends State<SalaryDialog> {
                   color: Colors.black87,
                   fontSize: 16,
                 ),
-                icon: const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
+                icon:
+                    const Icon(Icons.arrow_drop_down, color: Colors.blueAccent),
                 items: months.map((String month) {
                   return DropdownMenuItem<String>(
                     value: month,
@@ -713,7 +757,8 @@ class _SalaryDialogState extends State<SalaryDialog> {
           ),
         ),
         ElevatedButton(
-          onPressed: generateSalary,
+          onPressed: _isLoading ? null : generateSalary,
+          // Disable button while loading
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blueAccent,
             foregroundColor: Colors.white,
@@ -723,11 +768,20 @@ class _SalaryDialogState extends State<SalaryDialog> {
             ),
             elevation: 5,
           ),
-          child: const Text(
-            'Generate',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-          ),
-        ),
+          child: _isLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+              : const Text(
+                  'Generate',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+        )
       ],
     );
   }

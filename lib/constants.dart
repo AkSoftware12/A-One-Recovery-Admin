@@ -56,6 +56,7 @@ class ApiRoutes {
   static const String logout = "$baseUrl/logout";
   static const String clear = "$baseUrl/clear";
   static const String getProfile = "$baseUrl/get-profile";
+  static const String employeeCreate = "$baseUrl/admin/employee-create";
 
 
   static const String getEmployeeList = "$baseUrl/admin/employee-list";
@@ -94,10 +95,12 @@ class ApiRoutes {
   static const String getFundList = "$baseUrl/admin/fund-list";
   static const String deleteFund = "$baseUrl/admin/fund-delete";
   static const String createFund = "$baseUrl/admin/fund-create";
+  static const String updateFund = "$baseUrl/admin/fund-update";
 
 
 
-
+  static const String getAllotmentList = "$baseUrl/admin/recovery-list";
+  static const String assignAllot = "$baseUrl/admin/recovery-allotment";
 
 
 
