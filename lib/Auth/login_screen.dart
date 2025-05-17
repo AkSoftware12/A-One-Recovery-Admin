@@ -90,6 +90,8 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', responseData['token']);
           print('${AppStrings.tokenSaved}${responseData['token']}'); // Debug: Print the saved token
+          String name = responseData['data']['name'] ?? 'Unknown';
+          await saveName(name);
 
           // Retrieve the token
           String? token = prefs.getString('token');
@@ -133,7 +135,10 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       });
     }
   }
-
+  Future<void> saveName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('name', name);
+  }
   void _showErrorDialog(String message) {
     showDialog(
       context: context,

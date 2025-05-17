@@ -37,6 +37,9 @@ dependencies:
   animate_do: ^3.3.4
   url_launcher: ^6.0.20
   file_picker: ^6.1.1
+  syncfusion_flutter_datepicker: ^29.1.38
+
+
 
 
 

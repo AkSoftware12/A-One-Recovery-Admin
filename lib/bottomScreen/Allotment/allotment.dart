@@ -68,6 +68,9 @@ class _ExpensesScreenState extends State<AllotmentPage>
       setState(() {
         allotmentlist = data['recovery']['data'];
         filteredExpenses = allotmentlist;
+        _selectedLoanNos.clear();
+
+
         isLoading = false;
       });
       _animationController.forward(from: 0);
@@ -339,8 +342,9 @@ class _ExpensesScreenState extends State<AllotmentPage>
                         itemBuilder: (context, index) {
                           final allotmentlist = filteredExpenses[index];
                           final isExpanded = _expandedCards[index] ?? false;
-                          final loanNo = allotmentlist['id'].toString();
-                          final isSelected = _selectedLoanNos.contains(loanNo);
+                          final loanId = allotmentlist['id'].toString();
+                          final loanNo = allotmentlist['Loan_no'].toString();
+                          final isSelected = _selectedLoanNos.contains(loanId);
 
                           return FadeInUp(
                             child: GestureDetector(
@@ -380,7 +384,7 @@ class _ExpensesScreenState extends State<AllotmentPage>
                                                 setState(() {
                                                   if (value == true) {
                                                     if (_selectedLoanNos.length < 15) {
-                                                      _selectedLoanNos.add(loanNo);
+                                                      _selectedLoanNos.add(loanId);
                                                       print(_selectedLoanNos);
                                                     } else {
                                                       // Optional: Show a message to the user indicating max limit reached
@@ -389,7 +393,7 @@ class _ExpensesScreenState extends State<AllotmentPage>
                                                       );
                                                     }
                                                   } else {
-                                                    _selectedLoanNos.remove(loanNo);
+                                                    _selectedLoanNos.remove(loanId);
                                                     print(_selectedLoanNos);
                                                   }
                                                 });

@@ -295,7 +295,7 @@ class AllotRecoveryDialog {
         ),
         child: Center(
           child: Text(
-            'Add Fund',
+            'Allot Recovery',
             style: GoogleFonts.poppins(
               fontSize: TextSizes.text15,
               fontWeight: FontWeight.w600,
@@ -314,17 +314,25 @@ class AllotRecoveryDialog {
     print(_selectedCategory);
 
     try {
+      // Ensure _selectedCategory and _recovery are not null
+      if (_selectedCategory == null || _recovery == null) {
+        print('Error: _selectedCategory or _recovery is null');
+        return false;
+      }
+
+      // Prepare the JSON payload
+      final payload = {
+        'employee_id': _selectedCategory!['id'].toString(),
+        'loan_ids': _recovery
+      };
+
       var response = await http.post(
         url,
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          'employee_id': _selectedCategory!['id'].toString(),
-          'loan_ids': _recovery.toString(),
-
-        }),
+        body: json.encode(payload),
       );
 
       if (response.statusCode == 200) {
@@ -342,7 +350,6 @@ class AllotRecoveryDialog {
       return false;
     }
   }
-
 
   void dispose() {
     _amountController.dispose();

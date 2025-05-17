@@ -104,5 +104,9 @@ class ApiRoutes {
 
 
 
+
+  static const String attendanceCreate = "$baseUrl/admin/attandance-create";
+
+
   static const String notifications = "$baseUrl/notifications";
 }

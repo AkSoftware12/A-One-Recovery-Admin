@@ -11,14 +11,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../Auth/login_screen.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../bottomScreen/Allotment/allotment.dart';
+import '../../bottomScreen/Attendance/AttendanceScreen.dart';
+import '../../bottomScreen/Attendance/mark_attendance.dart';
 import '../../bottomScreen/Home/AllList/expenses_list.dart';
-import '../../bottomScreen/Home/AllList/sallery_list.dart';
 import '../../bottomScreen/Home/home.dart';
 import '../../bottomScreen/Profile/profile.dart';
 import '../../constants.dart';
 import '../../demo.dart';
 import '../../textSize.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 BuildContext? testContext;
@@ -41,13 +41,13 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     ScrollController(),
     ScrollController(),
   ];
-  String? username;
+  String? name;
   NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   @override
   void initState() {
     super.initState();
-    getName();
+    loadName();
     _controller = PersistentTabController(initialIndex: 0);
     _hideNavBar = false;
   }
@@ -60,13 +60,25 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     super.dispose();
   }
 
-  void getName() async {
-    final prefs = await SharedPreferences.getInstance();
+  // void getName() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //
+  //   setState(() {
+  //     username = prefs.getString('username');
+  //   });
+  //   print(username);
+  // }
 
+  Future<void> loadName() async {
+    String? savedName = await getName();
     setState(() {
-      username = prefs.getString('username');
+      name = savedName;
     });
-    print(username);
+  }
+
+  Future<String?> getName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('name');
   }
 
   Future<void> logoutApi(BuildContext context) async {
@@ -133,22 +145,22 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
   List<Widget> _buildScreens() => [
         HomeScreen(),
         AllotmentPage(),
-        SalaryScreen(),
+        AttendanceScreen(),
+        // SalaryScreen(),
         ExpensesScreen(),
         ProfileScreen(),
 
-
-    // MainScreen(
-    //   menuScreenContext: widget.menuScreenContext,
-    //   hideStatus: _hideNavBar,
-    //   onScreenHideButtonPressed: () {
-    //     setState(() {
-    //       _hideNavBar = !_hideNavBar;
-    //     });
-    //   },
-    //   onNavBarStyleChanged: (final value) =>
-    //       setState(() => _navBarStyle = value),
-    // ),
+        // MainScreen(
+        //   menuScreenContext: widget.menuScreenContext,
+        //   hideStatus: _hideNavBar,
+        //   onScreenHideButtonPressed: () {
+        //     setState(() {
+        //       _hideNavBar = !_hideNavBar;
+        //     });
+        //   },
+        //   onNavBarStyleChanged: (final value) =>
+        //       setState(() => _navBarStyle = value),
+        // ),
       ];
 
   Color? _getSecondaryItemColorForSpecificStyles() =>
@@ -214,10 +226,10 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
         ),
         PersistentBottomNavBarItem(
           icon: FaIcon(
-            FontAwesomeIcons.moneyBill1Wave,
+            FontAwesomeIcons.calendar,
             size: 16.sp,
           ),
-          title: "Payroll",
+          title: "Attendance",
           textStyle: GoogleFonts.poppins(
             textStyle: Theme.of(context).textTheme.displayLarge,
             fontSize: TextSizes.text12,
@@ -226,9 +238,29 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
             color: AppColors.textblack,
           ),
           activeColorPrimary: AppColors.bottomBarBG,
+          activeColorSecondary: _navBarStyle == NavBarStyle.style7 ||
+                  _navBarStyle == NavBarStyle.style10
+              ? Colors.white
+              : null,
           inactiveColorPrimary: HexColor('#cbd5e0'),
-          activeColorSecondary: _getSecondaryItemColorForSpecificStyles(),
         ),
+        // PersistentBottomNavBarItem(
+        //   icon: FaIcon(
+        //     FontAwesomeIcons.moneyBill1Wave,
+        //     size: 16.sp,
+        //   ),
+        //   title: "Payroll",
+        //   textStyle: GoogleFonts.poppins(
+        //     textStyle: Theme.of(context).textTheme.displayLarge,
+        //     fontSize: TextSizes.text12,
+        //     fontWeight: FontWeight.w500,
+        //     fontStyle: FontStyle.normal,
+        //     color: AppColors.textblack,
+        //   ),
+        //   activeColorPrimary: AppColors.bottomBarBG,
+        //   inactiveColorPrimary: HexColor('#cbd5e0'),
+        //   activeColorSecondary: _getSecondaryItemColorForSpecificStyles(),
+        // ),
         PersistentBottomNavBarItem(
           icon: FaIcon(
             FontAwesomeIcons.fileInvoiceDollar,
@@ -320,7 +352,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    username.toString(), // Ensure username is defined
+                    name.toString(), // Ensure username is defined
                     style: GoogleFonts.poppins(
                       fontSize: 14.sp,
                       fontWeight: FontWeight.w600,
@@ -328,14 +360,14 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                     ),
                   ),
                   SizedBox(height: 2.sp),
-                  Text(
-                    'Admin ID: 2100101',
-                    style: GoogleFonts.poppins(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.subTitlewhite.withOpacity(0.8),
-                    ),
-                  ),
+                  // Text(
+                  //   'Admin ID: 2100101',
+                  //   style: GoogleFonts.poppins(
+                  //     fontSize: 10.sp,
+                  //     fontWeight: FontWeight.w400,
+                  //     color: AppColors.subTitlewhite.withOpacity(0.8),
+                  //   ),
+                  // ),
                 ],
               ),
             ],
