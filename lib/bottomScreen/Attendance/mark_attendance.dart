@@ -50,6 +50,8 @@ class Attendance {
 class AttendanceScreen extends StatefulWidget {
   static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
+  const AttendanceScreen({super.key});
+
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
 }

@@ -77,6 +77,14 @@ class ApiRoutes {
 
 
 
+  static const String employeeDeductionList = "$baseUrl/admin/employee-deduction";
+  static const String employeeDeductionStore = "$baseUrl/admin/employee-deduction-store";
+  static const String employeeDeductionUpdate = "$baseUrl/admin/employee-deduction-update";
+  static const String employeeAllowanceList = "$baseUrl/admin/employee-allowance";
+
+
+
+
   static const String getSalaryList = "$baseUrl/admin/salary-list";
   static const String genrateSalary = "$baseUrl/admin/salary-genrate";
   static const String genrateSlip = "$baseUrl/admin/salary-slip/";

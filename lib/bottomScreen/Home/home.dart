@@ -1,3 +1,4 @@
+import 'package:aoneadmin/bottomScreen/Attendance/mark_attendance.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/deducation_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/expenses_list.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/allowances_list.dart';
@@ -11,6 +12,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import '../../Employee/EmployeeAllowance/employee_allowance.dart';
+import '../../Employee/EmployeeDeduction/employee_deduction.dart';
 import '../../HexColorCode/HexColor.dart';
 import '../../constants.dart';
 import '../../strings.dart';
@@ -830,7 +833,7 @@ class _BottomCardState extends State<BottomCard> {
       ),
       "title": "Recovery",
       "subtitle": "5.7%",
-      "amount": "Allowance",
+      "amount": "Create Allowance",
       "icon2": FaIcon(
         FontAwesomeIcons.arrowUp,
         size: 12.sp,
@@ -864,7 +867,7 @@ class _BottomCardState extends State<BottomCard> {
       ),
       "title": "Agents",
       "subtitle": "Active",
-      "amount": "Deduction",
+      "amount": "Create Deduction",
       "icon2": FaIcon(
         FontAwesomeIcons.userPlus,
         size: 12.sp,
@@ -888,6 +891,57 @@ class _BottomCardState extends State<BottomCard> {
         color: Colors.green,
       ),
       "color":HexColor('#6366f1')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.minusCircle,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Agents",
+      "subtitle": "Active",
+      "amount": "Employee Deduction",
+      "icon2": FaIcon(
+        FontAwesomeIcons.userPlus,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#6366f1')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.fileInvoiceDollar,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "Employee Allowance",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#eab308')
+
+    },
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.calendar,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "Employee Attendance",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color":HexColor('#eab308')
 
     },
   ];
@@ -923,177 +977,131 @@ class _BottomCardState extends State<BottomCard> {
         SizedBox(
           height: 2.sp,
         ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.3,
-          // or use Expanded if inside a flexible layout
-          child: GridView.builder(
-            itemCount: items.length, // number of items
-            physics: NeverScrollableScrollPhysics(),
-            gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3, // 2 columns
-              mainAxisSpacing: 15,
-              crossAxisSpacing: 15,
-              childAspectRatio: 0.94, // adjust as needed
-            ),
-            padding: const EdgeInsets.all(0),
-            itemBuilder: (context, index) {
-              final item = items[index];
+        GridView.builder(
+          shrinkWrap: true, // Makes GridView take only the space it needs
+          itemCount: items.length, // Number of items
+          physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, // 3 columns
+            mainAxisSpacing: 15,
+            crossAxisSpacing: 15,
+            childAspectRatio: 0.94, // Adjust as needed
+          ),
+          padding: const EdgeInsets.all(0),
+          itemBuilder: (context, index) {
+            final item = items[index];
 
-              return GestureDetector(
-                onTap: (){
-
-                  if(item['amount']=='Employee'){
-
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: EmployeeScreen(
-                        menuScreenContext: context,
-                      ),
-                    );
-                  } else if(item['amount']=='Expenses'){
-
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: ExpensesScreen(
-                        // menuScreenContext: context,
-                      ),
-                    );
-
-                  } else if(item['amount']=='Allowance'){
-                    // _allowanceDialog.show(context);
-
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: AllowanceScreen(
-                        // menuScreenContext: context,
-                      ),
-                    );
-
-                  }else if(item['amount']=='Salary'){
-                    // _createSalleryDialog.show(context);
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: SalaryScreen(
-                        // menuScreenContext: context,
-                      ),
-                    );
-
-                  }else if(item['amount']=='Deduction'){
-
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: DeducationScreen(
-                        // menuScreenContext: context,
-                      ),
-                    );
-
-                  }else if(item['amount']=='Manage Fund'){
-                    PersistentNavBarNavigator.pushNewScreen(
-                      context,
-                      screen: EmployeeFundScreen(),
-                    );
-                    // _manageFundDialog.show(context);
-
-                  }
+            return GestureDetector(
+              onTap: () {
+                if (item['amount'] == 'Employee') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: EmployeeScreen(
+                      menuScreenContext: context,
+                    ),
+                  );
+                } else if (item['amount'] == 'Expenses') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: ExpensesScreen(),
+                  );
+                }  else if (item['amount'] == 'Employee Deduction') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: EmployeeDeductionListScreen(),
+                  );
+                }
 
 
+                else if (item['amount'] == 'Create Allowance') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: AllowanceScreen(),
+                  );
+                }else if (item['amount'] == 'Employee Allowance') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: EmployeeAllowanceListScreen(),
+                  );
+                }
 
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.textWhite,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Stack(
-                    children: [
-                      // Align(
-                      //   alignment: Alignment.topRight,
-                      //   child: Container(
-                      //     width: 25.sp,
-                      //     height: 20.sp,
-                      //     decoration: BoxDecoration(
-                      //         color: AppColors.bgYellow,
-                      //
-                      //         borderRadius:BorderRadius.all(Radius.circular(10))
-                      //     ),
-                      //     child: Center(
-                      //       child: Padding(
-                      //         padding: const EdgeInsets.all(5.0),
-                      //         child: Text('25',style: TextStyle(fontSize: 12.sp,color: Colors.white),),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: 45.sp,  // size
-                                height: 45.sp,
-                                decoration: BoxDecoration(
-                                  color: item['color'],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Center(
-                                  child: item["icon"],
-
-                                ),
+                else if (item['amount'] == 'Salary') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: SalaryScreen(),
+                  );
+                } else if (item['amount'] == 'Create Deduction') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: DeducationScreen(),
+                  );
+                } else if (item['amount'] == 'Manage Fund') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: EmployeeFundScreen(),
+                  );
+                } else if (item['amount'] == 'Employee Attendance') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: AttendanceScreen(),
+                  );
+                }
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.textWhite,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 45.sp, // Size
+                              height: 45.sp,
+                              decoration: BoxDecoration(
+                                color: item['color'],
+                                shape: BoxShape.circle,
                               ),
-                              SizedBox(height: 8.sp),
-                              Center(
-                                child: Column(
-                                  children: [
-                                    Text(
-                                     '${ items[index]['amount'].toString()}',
-                                      style: GoogleFonts.poppins(
-                                        textStyle: Theme.of(context)
-                                            .textTheme
-                                            .displayLarge,
-                                        fontSize: TextSizes.text12,
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppColors.textblack,
-                                      ),
-                                      textAlign: TextAlign.center,
+                              child: Center(
+                                child: item["icon"],
+                              ),
+                            ),
+                            SizedBox(height: 8.sp),
+                            Center(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    items[index]['amount'].toString(),
+                                    style: GoogleFonts.poppins(
+                                      textStyle: Theme.of(context).textTheme.displayLarge,
+                                      fontSize: TextSizes.text12,
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.normal,
+                                      color: AppColors.textblack,
                                     ),
-                                    SizedBox(height: 5.sp),
-
-                                    Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(0.0),
-                                        child: Text('(${25})', style: GoogleFonts.poppins(
-                                          textStyle: Theme.of(context)
-                                              .textTheme
-                                              .displayLarge,
-                                          fontSize: TextSizes.text12,
-                                          fontWeight: FontWeight.w800,
-                                          fontStyle: FontStyle.normal,
-                                          color: AppColors.textblack,
-                                        ),),
-                                      ),
-                                    )
-                                  ],
-                                ),
-
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  SizedBox(height: 5.sp),
+                                ],
                               ),
-                              SizedBox(height: 8.sp),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 8.sp),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-
       ],
     );
   }
