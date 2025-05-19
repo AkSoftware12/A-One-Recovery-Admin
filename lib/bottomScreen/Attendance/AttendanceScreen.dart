@@ -48,7 +48,7 @@ class AttendanceTabScreen extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 5), // Bottom padding
           child: TabBarView(
             children: [
-              AttendanceScreen(),
+              AttendanceScreen(appBar: '',),
               MonthlyAttendanceScreen(),
             ],
           ),

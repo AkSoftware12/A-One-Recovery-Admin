@@ -13,7 +13,10 @@ import '../../HexColorCode/HexColor.dart';
 import '../../bottomScreen/Allotment/allotment.dart';
 import '../../bottomScreen/Attendance/AttendanceScreen.dart';
 import '../../bottomScreen/Attendance/mark_attendance.dart';
+import '../../bottomScreen/Home/AllList/employee_list.dart';
 import '../../bottomScreen/Home/AllList/expenses_list.dart';
+import '../../bottomScreen/Home/AllList/fund_list.dart';
+import '../../bottomScreen/Home/AllList/sallery_list.dart';
 import '../../bottomScreen/Home/home.dart';
 import '../../bottomScreen/Profile/profile.dart';
 import '../../constants.dart';
@@ -145,33 +148,12 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
   List<Widget> _buildScreens() => [
         HomeScreen(),
         AllotmentPage(),
-        AttendanceScreen(),
+        AttendanceScreen(appBar: '',),
         // SalaryScreen(),
-        ExpensesScreen(),
+        ExpensesScreen(appBar: '',),
         ProfileScreen(),
-
-        // MainScreen(
-        //   menuScreenContext: widget.menuScreenContext,
-        //   hideStatus: _hideNavBar,
-        //   onScreenHideButtonPressed: () {
-        //     setState(() {
-        //       _hideNavBar = !_hideNavBar;
-        //     });
-        //   },
-        //   onNavBarStyleChanged: (final value) =>
-        //       setState(() => _navBarStyle = value),
-        // ),
       ];
 
-  Color? _getSecondaryItemColorForSpecificStyles() =>
-      _navBarStyle == NavBarStyle.style7 ||
-              _navBarStyle == NavBarStyle.style10 ||
-              _navBarStyle == NavBarStyle.style15 ||
-              _navBarStyle == NavBarStyle.style16 ||
-              _navBarStyle == NavBarStyle.style17 ||
-              _navBarStyle == NavBarStyle.style18
-          ? HexColor('#cbd5e0')
-          : null;
 
   List<PersistentBottomNavBarItem> _navBarsItems() => [
         PersistentBottomNavBarItem(
@@ -463,22 +445,30 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         right: TextSizes.padding15,
                         top: 25.sp,
                       ),
-                      child: Row(
-                        children: [
-                          FaIcon(FontAwesomeIcons.home, size: 16.sp),
-                          SizedBox(
-                            width: 10.sp,
-                          ),
-                          Text(
-                            'Dashboard',
-                            style: GoogleFonts.poppins(
-                              fontSize: TextSizes.text16,
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.textblack,
+                      child: GestureDetector(
+                        onTap: (){
+
+                          Navigator.pop(context); // Close the progress dialog
+
+
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.home, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
                             ),
-                          ),
-                        ],
+                            Text(
+                              'Dashboard',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text16,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Padding(
@@ -486,86 +476,212 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                           left: TextSizes.padding11,
                           right: TextSizes.padding15,
                           top: TextSizes.padding15),
-                      child: Row(
-                        children: [
-                          FaIcon(FontAwesomeIcons.users, size: 16.sp),
-                          SizedBox(
-                            width: 10.sp,
-                          ),
-                          Text(
-                            'Employee',
-                            style: GoogleFonts.poppins(
-                              fontSize: TextSizes.text15,
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.textblack,
+                      child: GestureDetector(
+                        onTap: (){
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: EmployeeScreen(
+                              menuScreenContext: context, appBar: 'app',
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.users, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Employee',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
                       height: 8.sp,
                     ),
-                    _buildExpansionItem(
-                      icon: FaIcon(FontAwesomeIcons.calendarCheck, size: 16.sp),
-                      text: 'Attendance',
-                      children: [
-                        _buildSubItem(
-                            context, 'Mark Attendance', '/attendance/mark'),
-                        _buildSubItem(
-                            context, 'Attendance Report', '/attendance/report'),
-                      ],
-                    ),
-                    _buildExpansionItem(
-                      icon: FaIcon(FontAwesomeIcons.wallet, size: 16.sp),
-                      text: 'Fund Manager',
-                      children: [
-                        _buildSubItem(context, 'Fund List', '/fund/list'),
-                        _buildSubItem(context, 'Add Fund', '/fund/add'),
-                      ],
-                    ),
-                    _buildExpansionItem(
-                      icon: FaIcon(FontAwesomeIcons.fileInvoiceDollar,
-                          size: 16.sp),
-                      text: 'Expense Manager',
-                      children: [
-                        _buildSubItem(context, 'Expense List', '/expense/list'),
-                        _buildSubItem(context, 'Add Expense', '/expense/add'),
-                      ],
-                    ),
+
                     Padding(
                       padding: EdgeInsets.only(
                           left: TextSizes.padding11,
                           right: TextSizes.padding15,
                           top: TextSizes.padding15),
-                      child: Row(
-                        children: [
-                          FaIcon(FontAwesomeIcons.moneyBill1Wave, size: 16.sp),
-                          SizedBox(
-                            width: 10.sp,
-                          ),
-                          Text(
-                            'Salary',
-                            style: GoogleFonts.poppins(
-                              fontSize: TextSizes.text15,
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FontStyle.normal,
-                              color: AppColors.textblack,
+                      child: GestureDetector(
+                        onTap: (){
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: AttendanceScreen(
+                              appBar: 'app',
                             ),
-                          ),
-                        ],
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.calendar, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Attendance',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    ListTile(
-                      leading: Icon(Icons.logout, color: Colors.black),
-                      title:
-                          Text("Logout", style: TextStyle(color: Colors.black)),
-                      onTap: () {
-                        Navigator.pop(context); // Close the progress dialog
+                    SizedBox(
+                      height: 8.sp,
+                    ),
 
-                        logoutApi(context);
-                      },
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: TextSizes.padding11,
+                          right: TextSizes.padding15,
+                          top: TextSizes.padding15),
+                      child: GestureDetector(
+                        onTap: (){
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: EmployeeFundScreen(appBar: 'appbar',),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.wallet, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Fund Manager',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8.sp,
+                    ),
+
+
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: TextSizes.padding11,
+                          right: TextSizes.padding15,
+                          top: TextSizes.padding15),
+                      child: GestureDetector(
+                        onTap: (){
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: ExpensesScreen(appBar: 'appBar',),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.fileInvoiceDollar, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Expense Manager',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8.sp,
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: TextSizes.padding11,
+                          right: TextSizes.padding15,
+                          top: TextSizes.padding15),
+                      child: GestureDetector(
+                        onTap: (){
+
+                          PersistentNavBarNavigator.pushNewScreen(
+                            context,
+                            screen: SalaryScreen(appBar: 'appBar',),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            FaIcon(FontAwesomeIcons.moneyBill1Wave, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Salary',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    SizedBox(
+                      height: 8.sp,
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: TextSizes.padding11,
+                          right: TextSizes.padding15,
+                          top: TextSizes.padding15),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context); // Close the progress dialog
+
+                          logoutApi(context);
+                        },
+                        child: Row(
+                          children: [
+                             Icon(Icons.logout, color: Colors.black, size: 16.sp),
+                            SizedBox(
+                              width: 10.sp,
+                            ),
+                            Text(
+                              'Logout',
+                              style: GoogleFonts.poppins(
+                                fontSize: TextSizes.text15,
+                                fontWeight: FontWeight.w600,
+                                fontStyle: FontStyle.normal,
+                                color: AppColors.textblack,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -804,7 +920,18 @@ Widget _buildSubItem(BuildContext context, String title, String routeName) {
       splashColor: Colors.black.withOpacity(0.1),
       highlightColor: Colors.transparent,
       onTap: () {
-        Navigator.pushNamed(context, routeName);
+        if(routeName =='fundList'){
+          PersistentNavBarNavigator.pushNewScreen(
+            context,
+            screen: EmployeeFundScreen(appBar: '',),
+          );
+
+        }else if(routeName=='fundAdd'){
+          // PersistentNavBarNavigator.pushNewScreen(
+          //   context,
+          //   screen: AttendanceScreen(),
+          // );
+        }
       },
       child: Row(
         children: [

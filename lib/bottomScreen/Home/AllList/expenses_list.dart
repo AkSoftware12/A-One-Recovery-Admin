@@ -14,7 +14,8 @@ import '../../../textSize.dart';
 import '../DialogClass/ExpensesDialog/editExpensesDialog.dart'; // Adjust path as needed
 
 class ExpensesScreen extends StatefulWidget {
-  const ExpensesScreen({super.key});
+  final String appBar;
+  const ExpensesScreen({super.key, required this.appBar});
 
   @override
   State<ExpensesScreen> createState() => _ExpensesScreenState();
@@ -838,6 +839,82 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       },
     );
   }
+
+  Widget _buildAppBar() {
+    return Padding(
+      padding: EdgeInsets.only(top: 30.sp),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side with menu and user info
+          Row(
+            children: [
+              // Menu Button
+              Builder(
+                builder: (context) => GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Container(
+                    width: 40.sp,
+                    // Equal width and height for perfect circle
+                    height: 40.sp,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6.sp,
+                          offset: Offset(0, 3.sp),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      // Center the icon for better alignment
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 20.sp,
+                        color: AppColors.textWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.sp),
+              // User Info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Expense Manager', // Ensure username is defined
+                    style: GoogleFonts.poppins(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textWhite,
+                    ),
+                  ),
+                  SizedBox(height: 2.sp),
+                  // Text(
+                  //   'Admin ID: 2100101',
+                  //   style: GoogleFonts.poppins(
+                  //     fontSize: 10.sp,
+                  //     fontWeight: FontWeight.w400,
+                  //     color: AppColors.subTitlewhite.withOpacity(0.8),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1160,10 +1237,27 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 0.sp, vertical: 20.sp),
+          padding: EdgeInsets.symmetric(horizontal: 0.sp, vertical: 0.sp),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              widget.appBar != ''
+                  ? Container(
+                height: 80.sp,
+                decoration: BoxDecoration(
+                  color: AppColors.bgYellow,
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(20.sp),
+                  ),
+                  // border: Border.all(
+                  //   color: Colors.purple.shade100, // Or any color you want
+                  //   width: 1.sp,
+                  // ),
+                ),
+                padding: EdgeInsets.all(8.sp),
+                alignment: Alignment.center,
+                child: _buildAppBar(),
+              ):SizedBox(),
               // Search Bar
               Padding(
                 padding:  EdgeInsets.all(5.sp),

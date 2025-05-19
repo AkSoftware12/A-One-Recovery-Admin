@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../../constants.dart';
+import '../Allotment/allotment.dart';
 
 // Model classes for type safety
 class User {
@@ -48,9 +50,10 @@ class Attendance {
 }
 
 class AttendanceScreen extends StatefulWidget {
+  final String appBar;
   static final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-  const AttendanceScreen({super.key});
+  const AttendanceScreen({super.key, required this.appBar});
 
   @override
   _AttendanceScreenState createState() => _AttendanceScreenState();
@@ -278,233 +281,334 @@ class _AttendanceScreenState extends State<AttendanceScreen> with RouteAware {
     });
   }
 
+  Widget _buildAppBar() {
+    return Padding(
+      padding: EdgeInsets.only(top: 30.sp),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side with menu and user info
+          Row(
+            children: [
+              // Menu Button
+              Builder(
+                builder: (context) => GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Container(
+                    width: 40.sp,
+                    // Equal width and height for perfect circle
+                    height: 40.sp,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6.sp,
+                          offset: Offset(0, 3.sp),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      // Center the icon for better alignment
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 20.sp,
+                        color: AppColors.textWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.sp),
+              // User Info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Attendance', // Ensure username is defined
+                    style: GoogleFonts.poppins(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textWhite,
+                    ),
+                  ),
+                  SizedBox(height: 2.sp),
+                  // Text(
+                  //   'Admin ID: 2100101',
+                  //   style: GoogleFonts.poppins(
+                  //     fontSize: 10.sp,
+                  //     fontWeight: FontWeight.w400,
+                  //     color: AppColors.subTitlewhite.withOpacity(0.8),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : Padding(
-        padding: const EdgeInsets.all(8.0),
+      body: Padding(
+        padding: const EdgeInsets.all(0.0),
         child: Column(
           children: [
-            // Date Picker with Refresh Button
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime(2100),
-                      );
-                      if (pickedDate != null) {
-                        setState(() {
-                          selectedDate = pickedDate;
-                          fetchAttendance();
-                        });
-                      }
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          vertical: 14, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                            color: Colors.blueGrey.withOpacity(0.6)),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.blueGrey.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            DateFormat('dd MMM, yyyy')
-                                .format(selectedDate),
-                            style: TextStyle(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Icon(Icons.calendar_month,
-                              color: Colors.blueGrey),
-                        ],
-                      ),
-                    ),
-                  ),
+            widget.appBar != ''
+                ? Container(
+              height: 80.sp,
+              decoration: BoxDecoration(
+                color: AppColors.bgYellow,
+                borderRadius: BorderRadius.vertical(
+                  bottom: Radius.circular(20.sp),
                 ),
-                SizedBox(width: 8.sp),
-                IconButton(
-                  icon: Icon(Icons.refresh,
-                      size: 24.sp, color: Colors.grey[700]),
-                  onPressed: () {
-                    setState(() {
-                      selectedDate = DateTime.now();
-                    });
-                    fetchAttendance();
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 12.sp),
-
-            // Global Attendance Selection
-            Card(
-              elevation: 5,
-              color: Colors.blue.shade100,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
+                // border: Border.all(
+                //   color: Colors.purple.shade100, // Or any color you want
+                //   width: 1.sp,
+                // ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _globalRadioButton(1, "P", Colors.green),
-                  _globalRadioButton(2, "A", Colors.red),
-                  _globalRadioButton(3, "L", Colors.blue),
-                  _globalRadioButton(4, "H", Colors.orange),
-                ],
-              ),
-            ),
-            SizedBox(height: 12.sp),
-
-            // Attendance List
+              padding: EdgeInsets.all(8.sp),
+              alignment: Alignment.center,
+              child: _buildAppBar(),
+            ):SizedBox(),
             Expanded(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                            color: Colors.grey.shade300,
-                            blurRadius: 5,
-                            spreadRadius: 2),
-                      ],
-                    ),
-                    child: DataTable(
-                      columnSpacing: 25.0,
-                      headingRowHeight: 50.0,
-                      dataRowHeight: 55.0,
-                      headingRowColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.blue.shade100),
-                      border:
-                      TableBorder.all(color: Colors.grey.shade300),
-                      columns: const [
-                        DataColumn(
-                          label: Text('Employee ID',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16)),
-                        ),
-                        DataColumn(
-                          label: Text('Name',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16)),
-                        ),
-                        DataColumn(
-                          label: Text('Attendance',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16)),
-                        ),
-                        DataColumn(
-                          label: Text('Note',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16)),
-                        ),
-                      ],
-                      rows: employees.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        var employee = entry.value;
+              child: isLoading
+                  ? const Center(child: AnimatedLoader())
+                  : Padding(
+                padding:  EdgeInsets.all(8.sp),
+                child: Column(
+                  children: [
 
-                        return DataRow(
-                          color: MaterialStateColor.resolveWith((states) =>
-                          index.isEven
-                              ? Colors.white
-                              : Colors.grey.shade100),
-                          cells: [
-                            DataCell(
-                              Text(
-                                employee['unique_id'].toString(),
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500),
+                    // Date Picker with Refresh Button
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2100),
+                              );
+                              if (pickedDate != null) {
+                                setState(() {
+                                  selectedDate = pickedDate;
+                                  fetchAttendance();
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 20),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                    color: Colors.blueGrey.withOpacity(0.6)),
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.blueGrey.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    offset: Offset(0, 2),
+                                  ),
+                                ],
                               ),
-                            ),
-                            DataCell(
-                              Text(
-                                employee['name'].toString(),
-                                style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            DataCell(
-                              Row(
+                              child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceEvenly,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
-                                  _attendanceRadioButton(
-                                      employee['user_id'].toString(),
-                                      1,
-                                      "P",
-                                      Colors.green),
-                                  _attendanceRadioButton(
-                                      employee['user_id'].toString(),
-                                      2,
-                                      "A",
-                                      Colors.red),
-                                  _attendanceRadioButton(
-                                      employee['user_id'].toString(),
-                                      3,
-                                      "L",
-                                      Colors.blue),
-                                  _attendanceRadioButton(
-                                      employee['user_id'].toString(),
-                                      4,
-                                      "H",
-                                      Colors.orange),
+                                  Text(
+                                    DateFormat('dd MMM, yyyy')
+                                        .format(selectedDate),
+                                    style: TextStyle(
+                                      fontSize: 15.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  Icon(Icons.calendar_month,
+                                      color: Colors.blueGrey),
                                 ],
                               ),
                             ),
-                            DataCell(
-                              TextField(
-                                controller: TextEditingController(
-                                    text: notes[index]),
-                                onChanged: (value) {
-                                  setState(() {
-                                    notes[index] = value;
-                                    attendances[index]['note'] = value;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                    hintText: 'Enter note'),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                          ),
+                        ),
+                        SizedBox(width: 8.sp),
+                        IconButton(
+                          icon: Icon(Icons.refresh,
+                              size: 24.sp, color: Colors.grey[700]),
+                          onPressed: () {
+                            setState(() {
+                              selectedDate = DateTime.now();
+                            });
+                            fetchAttendance();
+                          },
+                        ),
+                      ],
                     ),
-                  ),
+                    SizedBox(height: 12.sp),
+
+                    // Global Attendance Selection
+                    Card(
+                      elevation: 5,
+                      color: Colors.blue.shade100,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _globalRadioButton(1, "P", Colors.green),
+                          _globalRadioButton(2, "A", Colors.red),
+                          _globalRadioButton(3, "L", Colors.blue),
+                          _globalRadioButton(4, "H", Colors.orange),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 12.sp),
+
+                    // Attendance List
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                              boxShadow: [
+                                BoxShadow(
+                                    color: Colors.grey.shade300,
+                                    blurRadius: 5,
+                                    spreadRadius: 2),
+                              ],
+                            ),
+                            child: DataTable(
+                              columnSpacing: 25.0,
+                              headingRowHeight: 50.0,
+                              dataRowHeight: 55.0,
+                              headingRowColor: MaterialStateColor.resolveWith(
+                                      (states) => Colors.blue.shade100),
+                              border:
+                              TableBorder.all(color: Colors.grey.shade300),
+                              columns: const [
+                                DataColumn(
+                                  label: Text('Employee ID',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                ),
+                                DataColumn(
+                                  label: Text('Name',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                ),
+                                DataColumn(
+                                  label: Text('Attendance',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                ),
+                                DataColumn(
+                                  label: Text('Note',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                ),
+                              ],
+                              rows: employees.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                var employee = entry.value;
+
+                                return DataRow(
+                                  color: MaterialStateColor.resolveWith((states) =>
+                                  index.isEven
+                                      ? Colors.white
+                                      : Colors.grey.shade100),
+                                  cells: [
+                                    DataCell(
+                                      Text(
+                                        employee['unique_id'].toString(),
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        employee['name'].toString(),
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Row(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          _attendanceRadioButton(
+                                              employee['user_id'].toString(),
+                                              1,
+                                              "P",
+                                              Colors.green),
+                                          _attendanceRadioButton(
+                                              employee['user_id'].toString(),
+                                              2,
+                                              "A",
+                                              Colors.red),
+                                          _attendanceRadioButton(
+                                              employee['user_id'].toString(),
+                                              3,
+                                              "L",
+                                              Colors.blue),
+                                          _attendanceRadioButton(
+                                              employee['user_id'].toString(),
+                                              4,
+                                              "H",
+                                              Colors.orange),
+                                        ],
+                                      ),
+                                    ),
+                                    DataCell(
+                                      TextField(
+                                        controller: TextEditingController(
+                                            text: notes[index]),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            notes[index] = value;
+                                            attendances[index]['note'] = value;
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                            hintText: 'Enter note'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

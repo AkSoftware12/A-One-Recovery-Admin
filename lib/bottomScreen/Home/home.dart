@@ -997,13 +997,13 @@ class _BottomCardState extends State<BottomCard> {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
                     screen: EmployeeScreen(
-                      menuScreenContext: context,
+                      menuScreenContext: context, appBar: '',
                     ),
                   );
                 } else if (item['amount'] == 'Expenses') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: ExpensesScreen(),
+                    screen: ExpensesScreen(appBar: '',),
                   );
                 }  else if (item['amount'] == 'Employee Deduction') {
                   PersistentNavBarNavigator.pushNewScreen(
@@ -1028,7 +1028,7 @@ class _BottomCardState extends State<BottomCard> {
                 else if (item['amount'] == 'Salary') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: SalaryScreen(),
+                    screen: SalaryScreen(appBar: '',),
                   );
                 } else if (item['amount'] == 'Create Deduction') {
                   PersistentNavBarNavigator.pushNewScreen(
@@ -1038,12 +1038,12 @@ class _BottomCardState extends State<BottomCard> {
                 } else if (item['amount'] == 'Manage Fund') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: EmployeeFundScreen(),
+                    screen: EmployeeFundScreen(appBar: '',),
                   );
                 } else if (item['amount'] == 'Employee Attendance') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: AttendanceScreen(),
+                    screen: AttendanceScreen(appBar: '',),
                   );
                 }
               },

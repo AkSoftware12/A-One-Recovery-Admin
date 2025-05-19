@@ -13,7 +13,8 @@ import '../../../strings.dart';
 import '../../../textSize.dart';
 
 class EmployeeScreen extends StatefulWidget {
-  EmployeeScreen({super.key, required BuildContext menuScreenContext});
+  final String appBar;
+   EmployeeScreen({super.key, required BuildContext menuScreenContext, required this.appBar});
 
   @override
   State<EmployeeScreen> createState() => _EmployeeScreenState();
@@ -122,6 +123,82 @@ class _EmployeeScreenState extends State<EmployeeScreen>
     });
   }
 
+
+  Widget _buildAppBar() {
+    return Padding(
+      padding: EdgeInsets.only(top: 30.sp),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Left side with menu and user info
+          Row(
+            children: [
+              // Menu Button
+              Builder(
+                builder: (context) => GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).pop();
+
+                  },
+                  child: Container(
+                    width: 40.sp,
+                    // Equal width and height for perfect circle
+                    height: 40.sp,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          blurRadius: 6.sp,
+                          offset: Offset(0, 3.sp),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      // Center the icon for better alignment
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: 20.sp,
+                        color: AppColors.textWhite,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12.sp),
+              // User Info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Employee', // Ensure username is defined
+                    style: GoogleFonts.poppins(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textWhite,
+                    ),
+                  ),
+                  SizedBox(height: 2.sp),
+                  // Text(
+                  //   'Admin ID: 2100101',
+                  //   style: GoogleFonts.poppins(
+                  //     fontSize: 10.sp,
+                  //     fontWeight: FontWeight.w400,
+                  //     color: AppColors.subTitlewhite.withOpacity(0.8),
+                  //   ),
+                  // ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -174,193 +251,218 @@ class _EmployeeScreenState extends State<EmployeeScreen>
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(5.sp),
+          padding: EdgeInsets.all(0.sp),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: SlideTransition(
-                  position: _slideAnimation,
-                  child: Card(
-                    color: HexColor('#fefefe'),
-                    elevation: 6,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+              widget.appBar != ''
+                  ? Container(
+                height: 80.sp,
+                decoration: BoxDecoration(
+                  color: AppColors.bgYellow,
+                  borderRadius: BorderRadius.vertical(
+                    bottom: Radius.circular(20.sp),
+                  ),
+                  // border: Border.all(
+                  //   color: Colors.purple.shade100, // Or any color you want
+                  //   width: 1.sp,
+                  // ),
+                ),
+                padding: EdgeInsets.all(8.sp),
+                alignment: Alignment.center,
+                child: _buildAppBar(),
+              ):SizedBox(),
+              Padding(
+                padding:  EdgeInsets.all(5.sp),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Card(
+                          color: HexColor('#fefefe'),
+                          elevation: 6,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(10.sp),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Employee'.toUpperCase(),
+                                  style: GoogleFonts.poppins(
+                                    fontSize: MediaQuery.of(context).size.width * 0.045,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.textblack,
+                                  ),
+                                ),
+                                SizedBox(height: 5.sp),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: SummaryCard(
+                                        title: "Active Employee",
+                                        value: activeCount?.toString() ?? '0',
+                                        isActive: true,
+                                        animationDelay: 100,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 10.sp,
+                                    ),
+                                    Expanded(
+                                      child: SummaryCard(
+                                        title: "Inactive Employee",
+                                        value: inactiveCount?.toString() ?? '0',
+                                        isActive: false,
+                                        animationDelay: 200,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(10.sp),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    SizedBox(height: 20.sp),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      transform: Matrix4.identity()
+                        ..scale(searchController.text.isNotEmpty ? 1.02 : 1.0),
+                      child: TextField(
+                        controller: searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search employees by name...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey[400],
+                            fontWeight: FontWeight.w400,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey[700],
+                            size: 22,
+                          ),
+                          suffixIcon: searchController.text.isNotEmpty
+                              ? IconButton(
+                            icon: Icon(Icons.clear,
+                                color: Colors.grey[700], size: 20),
+                            onPressed: () {
+                              searchController.clear();
+                              _filterEmployees();
+                            },
+                          )
+                              : null,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide.none,
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            borderSide: BorderSide(
+                              color: AppColors.bgYellow,
+                              width: 2,
+                            ),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                          isDense: true,
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                        ),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                          fontFamily: 'Roboto',
+                        ),
+                        cursorColor: AppColors.bgYellow,
+                      ),
+                    ),
+                    SizedBox(height: 20.sp),
+                    FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                         children: [
                           Text(
-                            'Employee'.toUpperCase(),
+                            'EMPLOYEE LIST (${filteredFees.length})',
                             style: GoogleFonts.poppins(
-                              fontSize: MediaQuery.of(context).size.width * 0.045,
+                              fontSize: TextSizes.text12,
                               fontWeight: FontWeight.w800,
                               color: AppColors.textblack,
                             ),
                           ),
-                          SizedBox(height: 5.sp),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: SummaryCard(
-                                  title: "Active Employee",
-                                  value: activeCount?.toString() ?? '0',
-                                  isActive: true,
-                                  animationDelay: 100,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 10.sp,
-                              ),
-                              Expanded(
-                                child: SummaryCard(
-                                  title: "Inactive Employee",
-                                  value: inactiveCount?.toString() ?? '0',
-                                  isActive: false,
-                                  animationDelay: 200,
-                                ),
-                              ),
-                            ],
-                          ),
+                          IconButton(
+                            icon: Icon(Icons.refresh,
+                                size: 24.sp, color: Colors.grey[700]),
+                            onPressed: fetchEmployeeData,
+                          )
                         ],
                       ),
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.sp),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-                transform: Matrix4.identity()
-                  ..scale(searchController.text.isNotEmpty ? 1.02 : 1.0),
-                child: TextField(
-                  controller: searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search employees by name...',
-                    hintStyle: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w400,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey[700],
-                      size: 22,
-                    ),
-                    suffixIcon: searchController.text.isNotEmpty
-                        ? IconButton(
-                      icon: Icon(Icons.clear,
-                          color: Colors.grey[700], size: 20),
-                      onPressed: () {
-                        searchController.clear();
-                        _filterEmployees();
-                      },
-                    )
-                        : null,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(color: Colors.grey[200]!, width: 1),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(16),
-                      borderSide: BorderSide(
-                        color: AppColors.bgYellow,
-                        width: 2,
+                    SizedBox(height: 10.sp),
+                    isLoading
+                        ? Center(child: AnimatedLoader())
+                        : Card(
+                      color: Colors.white,
+                      elevation: 4,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: List.generate(filteredFees.length, (index) {
+                            final employee = filteredFees[index];
+                            return FadeTransition(
+                              opacity: _fadeAnimation,
+                              child: SlideTransition(
+                                position: _slideAnimation,
+                                child: EmployeeCard(
+                                  initials: employee['name']
+                                      .split(' ')
+                                      .map((e) => e[0])
+                                      .join(),
+                                  name: employee['name']??'',
+                                  base: employee['email']??'',
+                                  incentive: employee['joining_date']??'',
+                                  total: employee['joining_date']??'',
+                                  status: employee['status'].toString(),
+                                  avatarColor:
+                                  avatarColors[index % avatarColors.length],
+                                ),
+                              ),
+                            );
+                          }),
+                        ),
                       ),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding:
-                    EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    isDense: true,
-                    floatingLabelBehavior: FloatingLabelBehavior.never,
-                  ),
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black87,
-                    fontFamily: 'Roboto',
-                  ),
-                  cursorColor: AppColors.bgYellow,
-                ),
-              ),
-              SizedBox(height: 20.sp),
-              FadeTransition(
-                opacity: _fadeAnimation,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                  children: [
-                    Text(
-                      'EMPLOYEE LIST (${filteredFees.length})',
-                      style: GoogleFonts.poppins(
-                        fontSize: TextSizes.text12,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textblack,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.refresh,
-                          size: 24.sp, color: Colors.grey[700]),
-                      onPressed: fetchEmployeeData,
-                    )
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.sp),
-              isLoading
-                  ? Center(child: AnimatedLoader())
-                  : Card(
-                color: Colors.white,
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    children: List.generate(filteredFees.length, (index) {
-                      final employee = filteredFees[index];
-                      return FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: SlideTransition(
-                          position: _slideAnimation,
-                          child: EmployeeCard(
-                            initials: employee['name']
-                                .split(' ')
-                                .map((e) => e[0])
-                                .join(),
-                            name: employee['name']??'',
-                            base: employee['email']??'',
-                            incentive: employee['joining_date']??'',
-                            total: employee['joining_date']??'',
-                            status: employee['status'].toString(),
-                            avatarColor:
-                            avatarColors[index % avatarColors.length],
+                    Center(
+                      child: TextButton(
+                        onPressed: () {},
+                        child: AnimatedOpacity(
+                          opacity: filteredFees.isNotEmpty ? 1.0 : 0.5,
+                          duration: const Duration(milliseconds: 300),
+                          child: Text(
+                            'VIEW ALL EMPLOYEES (${filteredFees.length})',
+                            style: TextStyle(color: Colors.blue),
                           ),
                         ),
-                      );
-                    }),
-                  ),
-                ),
-              ),
-              Center(
-                child: TextButton(
-                  onPressed: () {},
-                  child: AnimatedOpacity(
-                    opacity: filteredFees.isNotEmpty ? 1.0 : 0.5,
-                    duration: const Duration(milliseconds: 300),
-                    child: Text(
-                      'VIEW ALL EMPLOYEES (${filteredFees.length})',
-                      style: TextStyle(color: Colors.blue),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ],
