@@ -10,6 +10,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Auth/login_screen.dart';
 import '../../HexColorCode/HexColor.dart';
+import '../../Widget/AppBar/appBar.dart';
 import '../../bottomScreen/Allotment/allotment.dart';
 import '../../bottomScreen/Attendance/AttendanceScreen.dart';
 import '../../bottomScreen/Attendance/mark_attendance.dart';
@@ -421,7 +422,12 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
     // final packageInfo = await PackageInfo.fromPlatform();
     // final version = packageInfo.version;
 
-    return Scaffold(
+    return
+
+
+
+
+      Scaffold(
       drawer: Drawer(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
@@ -481,7 +487,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
                             screen: EmployeeScreen(
-                              menuScreenContext: context, appBar: 'app',
+                              menuScreenContext: context, appBar: 'Employee',
                             ),
                           );
                         },
@@ -518,7 +524,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
                             screen: AttendanceScreen(
-                              appBar: 'app',
+                              appBar: 'Attendance',
                             ),
                           );
                         },
@@ -554,7 +560,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         onTap: (){
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
-                            screen: EmployeeFundScreen(appBar: 'appbar',),
+                            screen: EmployeeFundScreen(appBar: 'Fund Manager',),
                           );
                         },
                         child: Row(
@@ -590,7 +596,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                         onTap: (){
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
-                            screen: ExpensesScreen(appBar: 'appBar',),
+                            screen: ExpensesScreen(appBar: 'Expense Manager',),
                           );
                         },
                         child: Row(
@@ -626,7 +632,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
 
                           PersistentNavBarNavigator.pushNewScreen(
                             context,
-                            screen: SalaryScreen(appBar: 'appBar',),
+                            screen: SalaryScreen(appBar: 'Salary',),
                           );
                         },
                         child: Row(

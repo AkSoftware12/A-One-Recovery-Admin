@@ -57,6 +57,7 @@ class ApiRoutes {
   static const String clear = "$baseUrl/clear";
   static const String getProfile = "$baseUrl/get-profile";
   static const String employeeCreate = "$baseUrl/admin/employee-create";
+  static const String dashboard = "$baseUrl/admin/dashboard";
 
 
   static const String getEmployeeList = "$baseUrl/admin/employee-list";
