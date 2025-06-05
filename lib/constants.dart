@@ -42,7 +42,8 @@ class ApiRoutes {
 
 
   // Main App Url
-  static const String baseUrl = "https://aone.akdesire.com/api";
+  // static const String baseUrl = "https://aone.akdesire.com/api";
+  static const String baseUrl = "https://aonerecovery.in/api";
 
 
 // Local  App Url
