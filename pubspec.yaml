@@ -5,10 +5,10 @@ description: "A new Flutter project."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 
-version: 1.0.2+2
+version: 1.0.3+3
 
 environment:
-  sdk: ^3.6.1
+  sdk: ^3.8.1
 
 
 dependencies:
@@ -36,7 +36,7 @@ dependencies:
   shared_preferences: ^2.2.3
   animate_do: ^3.3.4
   url_launcher: ^6.0.20
-  file_picker: ^6.1.1
+  file_picker: ^10.2.0
   syncfusion_flutter_datepicker: ^29.1.38
   searchable_paginated_dropdown: ^1.0.5
   animated_custom_dropdown: ^3.1.1
