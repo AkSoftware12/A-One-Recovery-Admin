@@ -2,6 +2,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants.dart';
 import 'Auth/login_screen.dart';
@@ -44,6 +46,9 @@ class _SplashScreenState extends State<SplashScreen> {
       // Save the token in shared preferences
       // await _setTokenInSharedPreferences();
       // Navigate to BottomNavBarScreen after 5 seconds if connected
+
+      await Future.delayed(const Duration(seconds: 4)); // splash delay
+
       if (token != null && token.isNotEmpty) {
         Navigator.pushReplacement(
           context,
@@ -80,24 +85,53 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.background, // Moved color inside decoration
-            borderRadius: BorderRadius.circular(20),
-          ),
-          padding: EdgeInsets.all(10), // Optional: Add some padding inside the container
-          child: _isConnected
-              ? Image.asset(
-            AppAssets.logo,
-            width: MediaQuery.of(context).size.width * 0.5, // Responsive width
-            height: MediaQuery.of(context).size.height * 0.25, // Responsive height
-            fit: BoxFit.contain,
-          )
-              : const CircularProgressIndicator(), // Show loading spinner if not connected
+      backgroundColor: AppColors.bgYellow,
+      body:  Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Logo image
+            Container(
+              height: 80.sp,
+              width: 80.sp,
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20))
+              ),
+              child: Padding(
+                padding:  EdgeInsets.all(0.sp),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20.sp),
+                  child: Image.asset(
+                    'assets/aonelogo.png',
+                    width: 100.sp,
+                    height: 100.sp,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 10.sp), // Spacing between logo and app name
+            // App name
+            Text(
+              'A One Recovery', // Replace with your app name
+              style: GoogleFonts.poppins(
+                fontSize: 12.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // White text for contrast
+              ),
+            ),
+
+            SizedBox(height: 20.sp), // Spacing before loader
+            const CupertinoActivityIndicator(
+              radius: 10,
+              color: Colors.white,
+            ),
+          ],
         ),
       ),
+
+
+
     );
   }
 }

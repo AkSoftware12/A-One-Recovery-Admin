@@ -15,16 +15,17 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../Auth/login_screen.dart';
 import '../../Employee/EmployeeAllowance/employee_allowance.dart';
 import '../../Employee/EmployeeDeduction/employee_deduction.dart';
 import '../../HexColorCode/HexColor.dart';
+import '../../Report/report.dart';
 import '../../constants.dart';
 import '../../strings.dart';
 import '../../textSize.dart';
 import 'AllList/employee_list.dart';
 import 'AllList/fund_list.dart';
 import 'package:http/http.dart' as http;
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,7 +35,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   List<Map<String, dynamic>> items = [
     {
       "icon": FaIcon(
@@ -84,10 +84,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   Map<String, dynamic>? totalData;
 
-   String? emitotalTotal;
-   String? employeeTotal;
+  String? emitotalTotal;
+  String? employeeTotal;
 
-@override
+  @override
   void initState() {
     super.initState();
     fetchTotal();
@@ -96,6 +96,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchTotal() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+
+    if (token == null) {
+      _showLoginDialog();
+      return;
+    }
 
     final response = await http.get(
       Uri.parse(ApiRoutes.dashboard),
@@ -113,6 +118,27 @@ class _HomeScreenState extends State<HomeScreen> {
       // Handle error (e.g., show login dialog)
     }
   }
+  void _showLoginDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (ctx) => CupertinoAlertDialog(
+        title: const Text('Session Expired'),
+        content: const Text('Please log in again to continue.'),
+        actions: [
+          CupertinoDialogAction(
+            child: const Text('OK'),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +146,6 @@ class _HomeScreenState extends State<HomeScreen> {
     String formattedDate = DateFormat('dd-MMM-yyyy').format(now);
     print(formattedDate); // e.g., 2025-04-25
     return Scaffold(
-
       body: Stack(
         children: [
           Container(
@@ -151,342 +176,351 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Card(
                       color: HexColor('#fefefe'),
                       child: Padding(
-                          padding: EdgeInsets.all(10.sp),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.all(0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Welcome, Admin!',
-                                          style: GoogleFonts.poppins(
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .displayLarge,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.045,
-                                            fontWeight: FontWeight.w800,
-                                            color: AppColors.textblack,
-                                          ),
-                                        ),
-                                        SizedBox(height: 5.sp),
-                                        Text(
-                                          AppStrings.recovery,
-                                          style: GoogleFonts.poppins(
-                                            textStyle: Theme.of(context)
-                                                .textTheme
-                                                .displayLarge,
-                                            fontSize: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.035,
-                                            color: AppColors.subTitleBlack,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Container(
-                                          height: 25.sp,
-                                          decoration: BoxDecoration(
-                                              color: AppColors.bottomBg,
-                                              borderRadius:
-                                                  BorderRadius.circular(5.sp)),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 5.sp),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.calendar_month,
-                                                  size: 15.sp,
-                                                  color: AppColors.bgYellow,
-                                                ),
-                                                SizedBox(width: 5.sp),
-                                                Text(
-                                                  formattedDate,
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: TextSizes.text12,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColors.textBlack,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: TextSizes.padding11),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              SizedBox(height: 10.sp),
-
-                              // 👉 GridView here
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.12,
-                                // or use Expanded if inside a flexible layout
-                                // child: GridView.builder(
-                                //   itemCount: items.length, // number of items
-                                //   gridDelegate:
-                                //       const SliverGridDelegateWithFixedCrossAxisCount(
-                                //     crossAxisCount: 3, // 2 columns
-                                //     mainAxisSpacing: 10,
-                                //     crossAxisSpacing: 10,
-                                //     childAspectRatio: 1.2, // adjust as needed
-                                //   ),
-                                //   padding: const EdgeInsets.all(0),
-                                //   itemBuilder: (context, index) {
-                                //     final item = items[index];
-                                //
-                                //     return Container(
-                                //       decoration: BoxDecoration(
-                                //         color: AppColors.bottomBg,
-                                //         borderRadius: BorderRadius.circular(10),
-                                //       ),
-                                //       child: Center(
-                                //         child: Padding(
-                                //           padding: const EdgeInsets.all(8.0),
-                                //           child: Column(
-                                //             crossAxisAlignment:
-                                //                 CrossAxisAlignment.start,
-                                //             mainAxisAlignment:
-                                //                 MainAxisAlignment.center,
-                                //             children: [
-                                //               Row(
-                                //                 children: [
-                                //                   item["icon"],
-                                //                   SizedBox(
-                                //                     width: 5.sp,
-                                //                   ),
-                                //                   Text(
-                                //                     items[index]['title'].toString() ??
-                                //                         'Total EMIs',
-                                //                     style: GoogleFonts.poppins(
-                                //                       textStyle:
-                                //                           Theme.of(context)
-                                //                               .textTheme
-                                //                               .displayLarge,
-                                //                       fontSize: 13.sp,
-                                //                       fontWeight:
-                                //                           FontWeight.w600,
-                                //                       fontStyle:
-                                //                           FontStyle.normal,
-                                //                       color: AppColors
-                                //                           .textblack,
-                                //                     ),
-                                //                   ),
-                                //                 ],
-                                //               ),
-                                //               SizedBox(height: 8.sp),
-                                //               Text(
-                                //                 emitotalTotal.toString(),
-                                //                 style: GoogleFonts.poppins(
-                                //                   textStyle: Theme.of(context)
-                                //                       .textTheme
-                                //                       .displayLarge,
-                                //                   fontSize: TextSizes.text20,
-                                //                   fontWeight: FontWeight.w700,
-                                //                   fontStyle: FontStyle.normal,
-                                //                   color: AppColors.textblack,
-                                //                 ),
-                                //               ),
-                                //               SizedBox(height: 8.sp),
-                                //               Row(
-                                //                 children: [
-                                //                   item["icon2"],
-                                //                   SizedBox(
-                                //                     width: 5.sp,
-                                //                   ),
-                                //                   Text(
-                                //                     items[index]['subtitle']
-                                //                             .toString() ??
-                                //                         '0.0',
-                                //                     style: GoogleFonts.poppins(
-                                //                       textStyle:
-                                //                           Theme.of(context)
-                                //                               .textTheme
-                                //                               .displayLarge,
-                                //                       fontSize:
-                                //                           TextSizes.text13,
-                                //                       fontWeight:
-                                //                           FontWeight.w600,
-                                //                       fontStyle:
-                                //                           FontStyle.normal,
-                                //                       color: Colors.green,
-                                //                     ),
-                                //                   ),
-                                //                 ],
-                                //               ),
-                                //             ],
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     );
-                                //   },
-                                // ),
-
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                Container(
-                                  width: 150.sp,
-                                decoration: BoxDecoration(
-                                color: AppColors.bottomBg,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            // item["icon"],
-                                            // SizedBox(
-                                            //   width: 5.sp,
-                                            // ),
-                                            Center(
-                                              child: Text(
-                                                'Total EMIs',
-                                                style: GoogleFonts.poppins(
-                                                  textStyle:
-                                                  Theme.of(context)
-                                                      .textTheme
-                                                      .displayLarge,
-                                                  fontSize: 13.sp,
-                                                  fontWeight:
-                                                  FontWeight.w600,
-                                                  fontStyle:
-                                                  FontStyle.normal,
-                                                  color: AppColors
-                                                      .textblack,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 8.sp),
-                                        Center(
-                                          child: Text(
-                                            emitotalTotal.toString(),
-                                            style: GoogleFonts.poppins(
-                                              textStyle: Theme.of(context)
-                                                  .textTheme
-                                                  .displayLarge,
-                                              fontSize: TextSizes.text20,
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal,
-                                              color: AppColors.textblack,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(height: 8.sp),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                                GestureDetector(
-                                  onTap: (){
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => EmployeeScreen(
-                                        menuScreenContext: context, appBar: '',
-                                      ),),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 150.sp,
-                                  decoration: BoxDecoration(
-                                  color: AppColors.bottomBg,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Center(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Column(
-                                        crossAxisAlignment:
+                        padding: EdgeInsets.all(10.sp),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Welcome, Admin!',
+                                        style: GoogleFonts.poppins(
+                                          textStyle: Theme.of(
+                                            context,
+                                          ).textTheme.displayLarge,
+                                          fontSize:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.045,
+                                          fontWeight: FontWeight.w800,
+                                          color: AppColors.textblack,
+                                        ),
+                                      ),
+                                      SizedBox(height: 5.sp),
+                                      Text(
+                                        AppStrings.recovery,
+                                        style: GoogleFonts.poppins(
+                                          textStyle: Theme.of(
+                                            context,
+                                          ).textTheme.displayLarge,
+                                          fontSize:
+                                              MediaQuery.of(
+                                                context,
+                                              ).size.width *
+                                              0.035,
+                                          color: AppColors.subTitleBlack,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Container(
+                                        height: 25.sp,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.bottomBg,
+                                          borderRadius: BorderRadius.circular(
+                                            5.sp,
+                                          ),
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 5.sp,
+                                          ),
+                                          child: Row(
                                             children: [
-                                              // item["icon"],
-                                              // SizedBox(
-                                              //   width: 5.sp,
-                                              // ),
-                                              Center(
-                                                child: Text(
-                                                  'Total Employees',
-                                                  style: GoogleFonts.poppins(
-                                                    textStyle:
-                                                    Theme.of(context)
-                                                        .textTheme
-                                                        .displayLarge,
-                                                    fontSize: 13.sp,
-                                                    fontWeight:
-                                                    FontWeight.w600,
-                                                    fontStyle:
-                                                    FontStyle.normal,
-                                                    color: AppColors
-                                                        .textblack,
-                                                  ),
+                                              Icon(
+                                                Icons.calendar_month,
+                                                size: 15.sp,
+                                                color: AppColors.bgYellow,
+                                              ),
+                                              SizedBox(width: 5.sp),
+                                              Text(
+                                                formattedDate,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: TextSizes.text12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColors.textBlack,
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          SizedBox(height: 8.sp),
-                                          Center(
-                                            child: Text(
-                                              employeeTotal.toString(),
-                                              style: GoogleFonts.poppins(
-                                                textStyle: Theme.of(context)
-                                                    .textTheme
-                                                    .displayLarge,
-                                                fontSize: TextSizes.text20,
-                                                fontWeight: FontWeight.w700,
-                                                fontStyle: FontStyle.normal,
-                                                color: AppColors.textblack,
+                                        ),
+                                      ),
+                                      SizedBox(height: TextSizes.padding11),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            SizedBox(height: 10.sp),
+
+                            // 👉 GridView here
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.12,
+
+                              // or use Expanded if inside a flexible layout
+                              // child: GridView.builder(
+                              //   itemCount: items.length, // number of items
+                              //   gridDelegate:
+                              //       const SliverGridDelegateWithFixedCrossAxisCount(
+                              //     crossAxisCount: 3, // 2 columns
+                              //     mainAxisSpacing: 10,
+                              //     crossAxisSpacing: 10,
+                              //     childAspectRatio: 1.2, // adjust as needed
+                              //   ),
+                              //   padding: const EdgeInsets.all(0),
+                              //   itemBuilder: (context, index) {
+                              //     final item = items[index];
+                              //
+                              //     return Container(
+                              //       decoration: BoxDecoration(
+                              //         color: AppColors.bottomBg,
+                              //         borderRadius: BorderRadius.circular(10),
+                              //       ),
+                              //       child: Center(
+                              //         child: Padding(
+                              //           padding: const EdgeInsets.all(8.0),
+                              //           child: Column(
+                              //             crossAxisAlignment:
+                              //                 CrossAxisAlignment.start,
+                              //             mainAxisAlignment:
+                              //                 MainAxisAlignment.center,
+                              //             children: [
+                              //               Row(
+                              //                 children: [
+                              //                   item["icon"],
+                              //                   SizedBox(
+                              //                     width: 5.sp,
+                              //                   ),
+                              //                   Text(
+                              //                     items[index]['title'].toString() ??
+                              //                         'Total EMIs',
+                              //                     style: GoogleFonts.poppins(
+                              //                       textStyle:
+                              //                           Theme.of(context)
+                              //                               .textTheme
+                              //                               .displayLarge,
+                              //                       fontSize: 13.sp,
+                              //                       fontWeight:
+                              //                           FontWeight.w600,
+                              //                       fontStyle:
+                              //                           FontStyle.normal,
+                              //                       color: AppColors
+                              //                           .textblack,
+                              //                     ),
+                              //                   ),
+                              //                 ],
+                              //               ),
+                              //               SizedBox(height: 8.sp),
+                              //               Text(
+                              //                 emitotalTotal.toString(),
+                              //                 style: GoogleFonts.poppins(
+                              //                   textStyle: Theme.of(context)
+                              //                       .textTheme
+                              //                       .displayLarge,
+                              //                   fontSize: TextSizes.text20,
+                              //                   fontWeight: FontWeight.w700,
+                              //                   fontStyle: FontStyle.normal,
+                              //                   color: AppColors.textblack,
+                              //                 ),
+                              //               ),
+                              //               SizedBox(height: 8.sp),
+                              //               Row(
+                              //                 children: [
+                              //                   item["icon2"],
+                              //                   SizedBox(
+                              //                     width: 5.sp,
+                              //                   ),
+                              //                   Text(
+                              //                     items[index]['subtitle']
+                              //                             .toString() ??
+                              //                         '0.0',
+                              //                     style: GoogleFonts.poppins(
+                              //                       textStyle:
+                              //                           Theme.of(context)
+                              //                               .textTheme
+                              //                               .displayLarge,
+                              //                       fontSize:
+                              //                           TextSizes.text13,
+                              //                       fontWeight:
+                              //                           FontWeight.w600,
+                              //                       fontStyle:
+                              //                           FontStyle.normal,
+                              //                       color: Colors.green,
+                              //                     ),
+                              //                   ),
+                              //                 ],
+                              //               ),
+                              //             ],
+                              //           ),
+                              //         ),
+                              //       ),
+                              //     );
+                              //   },
+                              // ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    width: 150.sp,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.bottomBg,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                // item["icon"],
+                                                // SizedBox(
+                                                //   width: 5.sp,
+                                                // ),
+                                                Center(
+                                                  child: Text(
+                                                    'Total EMIs',
+                                                    style: GoogleFonts.poppins(
+                                                      textStyle: Theme.of(
+                                                        context,
+                                                      ).textTheme.displayLarge,
+                                                      fontSize: 13.sp,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontStyle:
+                                                          FontStyle.normal,
+                                                      color:
+                                                          AppColors.textblack,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 8.sp),
+                                            Center(
+                                              child: Text(
+                                                emitotalTotal.toString(),
+                                                style: GoogleFonts.poppins(
+                                                  textStyle: Theme.of(
+                                                    context,
+                                                  ).textTheme.displayLarge,
+                                                  fontSize: TextSizes.text20,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontStyle: FontStyle.normal,
+                                                  color: AppColors.textblack,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SizedBox(height: 8.sp),
-                                        ],
+                                            SizedBox(height: 8.sp),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
-                                                                ),
-                                ),
-                                  ],
-                                ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => EmployeeScreen(
+                                            menuScreenContext: context,
+                                            appBar: '',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: 150.sp,
+                                      decoration: BoxDecoration(
+                                        color: AppColors.bottomBg,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  // item["icon"],
+                                                  // SizedBox(
+                                                  //   width: 5.sp,
+                                                  // ),
+                                                  Center(
+                                                    child: Text(
+                                                      'Total Employees',
+                                                      style: GoogleFonts.poppins(
+                                                        textStyle:
+                                                            Theme.of(context)
+                                                                .textTheme
+                                                                .displayLarge,
+                                                        fontSize: 13.sp,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontStyle:
+                                                            FontStyle.normal,
+                                                        color:
+                                                            AppColors.textblack,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              SizedBox(height: 8.sp),
+                                              Center(
+                                                child: Text(
+                                                  employeeTotal.toString(),
+                                                  style: GoogleFonts.poppins(
+                                                    textStyle: Theme.of(
+                                                      context,
+                                                    ).textTheme.displayLarge,
+                                                    fontSize: TextSizes.text20,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontStyle: FontStyle.normal,
+                                                    color: AppColors.textblack,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(height: 8.sp),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          )),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -494,26 +528,29 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // 1st card Close
 
-
                 // Quick Access Start
-
                 Padding(
-                  padding:  EdgeInsets.only(left: TextSizes.padding20,right: TextSizes.padding20),
+                  padding: EdgeInsets.only(
+                    left: TextSizes.padding20,
+                    right: TextSizes.padding20,
+                  ),
                   child: const BottomCard(),
                 ),
 
                 // Quick Access Close
-
-
                 Padding(
-                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15),
+                  padding: EdgeInsets.only(
+                    left: TextSizes.padding15,
+                    right: TextSizes.padding15,
+                  ),
                   child: Card(
                     color: AppColors.textWhite,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 4,
                     child: Padding(
-                      padding:  EdgeInsets.all(TextSizes.padding20),
+                      padding: EdgeInsets.all(TextSizes.padding20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -521,10 +558,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               Text(
+                              Text(
                                 'Recovery Progress',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text15,
                                   fontWeight: FontWeight.w800,
                                   fontStyle: FontStyle.normal,
@@ -543,15 +582,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               // ),
                             ],
                           ),
-                           SizedBox(height: 18.sp),
+                          SizedBox(height: 18.sp),
                           // Monthly Target
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children:  [
+                            children: [
                               Text(
                                 'Monthly Target',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text13,
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
@@ -561,7 +602,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 '₹8.5L / ₹12L',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text13,
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
@@ -585,23 +628,31 @@ class _HomeScreenState extends State<HomeScreen> {
                           // Completed & Days Left
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children:  [
-                              Text('70% Completed',
+                            children: [
+                              Text(
+                                '70% Completed',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text13,
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
                                   color: AppColors.subTitleBlack,
-                                ),),
-                              Text('15 days left',
+                                ),
+                              ),
+                              Text(
+                                '15 days left',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text13,
                                   fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal,
                                   color: AppColors.subTitleBlack,
-                                ),),
+                                ),
+                              ),
                             ],
                           ),
                           const SizedBox(height: 16),
@@ -657,10 +708,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           'Apr',
                                           'May',
                                           'Jun',
-                                          'Jul'
+                                          'Jul',
                                         ];
                                         return Padding(
-                                          padding: const EdgeInsets.only(top: 8),
+                                          padding: const EdgeInsets.only(
+                                            top: 8,
+                                          ),
                                           child: Text(
                                             months[value.toInt()],
                                             style: GoogleFonts.poppins(
@@ -673,12 +726,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                       },
                                     ),
                                   ),
-                                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                                  topTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
+                                  rightTitles: AxisTitles(
+                                    sideTitles: SideTitles(showTitles: false),
+                                  ),
                                 ),
                                 borderData: FlBorderData(
                                   show: true,
-                                  border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+                                  border: Border.all(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    width: 1,
+                                  ),
                                 ),
                                 minX: 0,
                                 maxX: 6,
@@ -701,23 +761,26 @@ class _HomeScreenState extends State<HomeScreen> {
                                     isStrokeCapRound: true,
                                     belowBarData: BarAreaData(
                                       show: true,
-                                      color: AppColors.bgYellow.withOpacity(0.15),
+                                      color: AppColors.bgYellow.withOpacity(
+                                        0.15,
+                                      ),
                                     ),
                                     dotData: FlDotData(
                                       show: true,
-                                      getDotPainter: (spot, percent, barData, index) =>
-                                          FlDotCirclePainter(
-                                            radius: 4,
-                                            color: AppColors.bgYellow,
-                                            strokeWidth: 2,
-                                            strokeColor: Colors.white,
-                                          ),
+                                      getDotPainter:
+                                          (spot, percent, barData, index) =>
+                                              FlDotCirclePainter(
+                                                radius: 4,
+                                                color: AppColors.bgYellow,
+                                                strokeWidth: 2,
+                                                strokeColor: Colors.white,
+                                              ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -725,14 +788,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 Padding(
-                  padding:  EdgeInsets.only(left: TextSizes.padding15,right: TextSizes.padding15,top: TextSizes.padding15),
+                  padding: EdgeInsets.only(
+                    left: TextSizes.padding15,
+                    right: TextSizes.padding15,
+                    top: TextSizes.padding15,
+                  ),
                   child: Card(
                     color: AppColors.textWhite,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     elevation: 4,
                     child: Padding(
-                      padding:  EdgeInsets.all(TextSizes.padding11),
+                      padding: EdgeInsets.all(TextSizes.padding11),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -743,7 +811,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               Text(
                                 'Top Performing Employee',
                                 style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
+                                  textStyle: Theme.of(
+                                    context,
+                                  ).textTheme.displayLarge,
                                   fontSize: TextSizes.text15,
                                   fontWeight: FontWeight.w800,
                                   fontStyle: FontStyle.normal,
@@ -752,35 +822,40 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               TextButton(
                                 onPressed: () {},
-                                child:  Text('View All', style: GoogleFonts.poppins(
-                                  textStyle: Theme.of(context).textTheme.displayLarge,
-                                  fontSize: TextSizes.text15,
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FontStyle.normal,
-                                  color: AppColors.bgYellow,
-                                ),),
+                                child: Text(
+                                  'View All',
+                                  style: GoogleFonts.poppins(
+                                    textStyle: Theme.of(
+                                      context,
+                                    ).textTheme.displayLarge,
+                                    fontSize: TextSizes.text15,
+                                    fontWeight: FontWeight.w500,
+                                    fontStyle: FontStyle.normal,
+                                    color: AppColors.bgYellow,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                           SizedBox(height: 10.sp),
                           // Monthly Target
                           ListView.builder(
-                              itemCount: 3,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              padding: EdgeInsets.all(0),
-                              itemBuilder: (context, index) {
-                                return ClientCard(
-                                  name: "Vikram Singh",
-                                  bank: "H92% Recovery Rate",
-                                  location: "Rohini, Delhi",
-                                  time: "10:30 AM",
-                                  days: "2 Month",
-                                  amount: "₹24,500",
-                                  color: Colors.purple,
-                                );
-                              }),
-
+                            itemCount: 3,
+                            shrinkWrap: true,
+                            physics: NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.all(0),
+                            itemBuilder: (context, index) {
+                              return ClientCard(
+                                name: "Vikram Singh",
+                                bank: "H92% Recovery Rate",
+                                location: "Rohini, Delhi",
+                                time: "10:30 AM",
+                                days: "2 Month",
+                                amount: "₹24,500",
+                                color: Colors.purple,
+                              );
+                            },
+                          ),
 
                           // Progress Bar
 
@@ -791,13 +866,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                SizedBox(
-                  height: 80.sp,
-                )
+                SizedBox(height: 80.sp),
               ],
             ),
           ),
-
         ],
       ),
     );
@@ -927,11 +999,7 @@ class SummaryCard extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.only(right: 3.sp),
-                        child: Icon(
-                          icon,
-                          size: 18.sp,
-                          color: color,
-                        ),
+                        child: Icon(icon, size: 18.sp, color: color),
                       ),
                       Text(
                         subValue,
@@ -947,7 +1015,7 @@ class SummaryCard extends StatelessWidget {
                   ),
                 ],
               ),
-              img
+              img,
             ],
           ),
         ),
@@ -955,7 +1023,6 @@ class SummaryCard extends StatelessWidget {
     );
   }
 }
-
 
 class BottomCard extends StatefulWidget {
   const BottomCard({super.key});
@@ -965,8 +1032,6 @@ class BottomCard extends StatefulWidget {
 }
 
 class _BottomCardState extends State<BottomCard> {
-
-
   List<Map<String, dynamic>> items = [
     {
       "icon": FaIcon(
@@ -982,7 +1047,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: AppColors.textWhite,
       ),
-      "color":HexColor('#3b82f6')
+      "color": HexColor('#3b82f6'),
     },
     {
       "icon": FaIcon(
@@ -998,8 +1063,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#22c55e')
-
+      "color": HexColor('#22c55e'),
     },
     {
       "icon": FaIcon(
@@ -1015,8 +1079,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#eab308')
-
+      "color": HexColor('#eab308'),
     },
     {
       "icon": FaIcon(
@@ -1032,8 +1095,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#ef4444')
-
+      "color": HexColor('#ef4444'),
     },
     {
       "icon": FaIcon(
@@ -1049,8 +1111,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#6366f1')
-
+      "color": HexColor('#6366f1'),
     },
     {
       "icon": FaIcon(
@@ -1066,8 +1127,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#6366f1')
-
+      "color": HexColor('#6366f1'),
     },
     {
       "icon": FaIcon(
@@ -1083,8 +1143,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#6366f1')
-
+      "color": HexColor('#6366f1'),
     },
     {
       "icon": FaIcon(
@@ -1100,8 +1159,7 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#eab308')
-
+      "color": HexColor('#eab308'),
     },
     {
       "icon": FaIcon(
@@ -1117,23 +1175,37 @@ class _BottomCardState extends State<BottomCard> {
         size: 12.sp,
         color: Colors.green,
       ),
-      "color":HexColor('#eab308')
+      "color": HexColor('#eab308'),
+    },
 
+    {
+      "icon": FaIcon(
+        FontAwesomeIcons.file,
+        size: 16.sp,
+        color: AppColors.textWhite,
+      ),
+      "title": "Recovery",
+      "subtitle": "5.7%",
+      "amount": "Report",
+      "icon2": FaIcon(
+        FontAwesomeIcons.arrowUp,
+        size: 12.sp,
+        color: Colors.green,
+      ),
+      "color": Colors.purple,
     },
   ];
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-
         Padding(
           padding: EdgeInsets.only(
-              left: TextSizes.padding5, right: TextSizes.padding5,bottom: 10.sp),
+            left: TextSizes.padding5,
+            right: TextSizes.padding5,
+            bottom: 10.sp,
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1154,13 +1226,14 @@ class _BottomCardState extends State<BottomCard> {
             ],
           ),
         ),
-        SizedBox(
-          height: 2.sp,
-        ),
+        SizedBox(height: 2.sp),
         GridView.builder(
-          shrinkWrap: true, // Makes GridView take only the space it needs
-          itemCount: items.length, // Number of items
-          physics: const NeverScrollableScrollPhysics(), // Disable scrolling
+          shrinkWrap: true,
+          // Makes GridView take only the space it needs
+          itemCount: items.length,
+          // Number of items
+          physics: const NeverScrollableScrollPhysics(),
+          // Disable scrolling
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, // 3 columns
             mainAxisSpacing: 15,
@@ -1176,9 +1249,12 @@ class _BottomCardState extends State<BottomCard> {
                 if (item['amount'] == 'Employee') {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => EmployeeScreen(
-                      menuScreenContext: context, appBar: '',
-                    ),),
+                    MaterialPageRoute(
+                      builder: (context) => EmployeeScreen(
+                        menuScreenContext: context,
+                        appBar: '',
+                      ),
+                    ),
                   );
                   // PersistentNavBarNavigator.pushNewScreen(
                   //   context,
@@ -1189,29 +1265,32 @@ class _BottomCardState extends State<BottomCard> {
                 } else if (item['amount'] == 'Expenses') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: ExpensesScreen(appBar: '',),
+                    screen: ExpensesScreen(appBar: ''),
                   );
-                }  else if (item['amount'] == 'Employee Deduction') {
+                } else if (item['amount'] == 'Report') {
+                  PersistentNavBarNavigator.pushNewScreen(
+                    context,
+                    screen: ReportScreen(),
+                  );
+                } else if (item['amount'] == 'Employee Deduction') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
                     screen: EmployeeDeductionListScreen(),
                   );
-                }
-                else if (item['amount'] == 'Create Allowance') {
+                } else if (item['amount'] == 'Create Allowance') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
                     screen: AllowanceScreen(),
                   );
-                }else if (item['amount'] == 'Employee Allowance') {
+                } else if (item['amount'] == 'Employee Allowance') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
                     screen: EmployeeAllowanceListScreen(),
                   );
-                }
-                else if (item['amount'] == 'Salary') {
+                } else if (item['amount'] == 'Salary') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: SalaryScreen(appBar: '',),
+                    screen: SalaryScreen(appBar: ''),
                   );
                 } else if (item['amount'] == 'Create Deduction') {
                   PersistentNavBarNavigator.pushNewScreen(
@@ -1221,12 +1300,12 @@ class _BottomCardState extends State<BottomCard> {
                 } else if (item['amount'] == 'Manage Fund') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: EmployeeFundScreen(appBar: '',),
+                    screen: EmployeeFundScreen(appBar: ''),
                   );
                 } else if (item['amount'] == 'Employee Attendance') {
                   PersistentNavBarNavigator.pushNewScreen(
                     context,
-                    screen: AttendanceScreen(appBar: '',),
+                    screen: AttendanceScreen(appBar: ''),
                   );
                 }
               },
@@ -1251,9 +1330,7 @@ class _BottomCardState extends State<BottomCard> {
                                 color: item['color'],
                                 shape: BoxShape.circle,
                               ),
-                              child: Center(
-                                child: item["icon"],
-                              ),
+                              child: Center(child: item["icon"]),
                             ),
                             SizedBox(height: 8.sp),
                             Center(
@@ -1262,7 +1339,9 @@ class _BottomCardState extends State<BottomCard> {
                                   Text(
                                     items[index]['amount'].toString(),
                                     style: GoogleFonts.poppins(
-                                      textStyle: Theme.of(context).textTheme.displayLarge,
+                                      textStyle: Theme.of(
+                                        context,
+                                      ).textTheme.displayLarge,
                                       fontSize: TextSizes.text12,
                                       fontWeight: FontWeight.w600,
                                       fontStyle: FontStyle.normal,
@@ -1346,9 +1425,7 @@ class SummaryBottomCard extends StatelessWidget {
                   Row(
                     children: [
                       icon,
-                      SizedBox(
-                        width: 5.sp,
-                      ),
+                      SizedBox(width: 5.sp),
                       Text(
                         subValue,
                         style: GoogleFonts.poppins(
@@ -1387,7 +1464,8 @@ class ClientCard extends StatelessWidget {
     required this.location,
     required this.time,
     required this.days,
-    required this.amount, required this.color,
+    required this.amount,
+    required this.color,
   });
 
   @override
@@ -1395,15 +1473,16 @@ class ClientCard extends StatelessWidget {
     String initials = '';
     if (name.isNotEmpty) initials += name[0];
     // if (lastName.isNotEmpty) initials += lastName[0];
-    return  Padding(
-      padding:  EdgeInsets.only(bottom: TextSizes.padding15),
+    return Padding(
+      padding: EdgeInsets.only(bottom: TextSizes.padding15),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             children: [
               Container(
-                height: 40.sp, // or 25.sp if using flutter_screenutil
+                height: 40.sp,
+                // or 25.sp if using flutter_screenutil
                 width: 40.sp,
                 decoration: BoxDecoration(
                   color: color, // background color
@@ -1421,9 +1500,7 @@ class ClientCard extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(
-                width: 5.sp,
-              ),
+              SizedBox(width: 5.sp),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1438,7 +1515,7 @@ class ClientCard extends StatelessWidget {
                       color: AppColors.textblack,
                     ),
                   ),
-                  SizedBox(height: 3.sp,),
+                  SizedBox(height: 3.sp),
                   Text(
                     bank,
                     style: GoogleFonts.poppins(
@@ -1450,7 +1527,7 @@ class ClientCard extends StatelessWidget {
                     ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
           Column(
@@ -1467,7 +1544,7 @@ class ClientCard extends StatelessWidget {
                   color: AppColors.textblack,
                 ),
               ),
-              SizedBox(height: 3.sp,),
+              SizedBox(height: 3.sp),
               Text(
                 '+12% this month',
                 style: GoogleFonts.poppins(
@@ -1479,8 +1556,7 @@ class ClientCard extends StatelessWidget {
                 ),
               ),
             ],
-          )
-
+          ),
         ],
       ),
     );

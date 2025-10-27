@@ -4,6 +4,7 @@ import 'package:aoneadmin/HexColorCode/HexColor.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/sallery_list.dart';
 import 'package:aoneadmin/strings.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -170,182 +171,184 @@ class _ExpensesScreenState extends State<ExpensesScreen>
               right: 20,
               bottom: MediaQuery.of(context).viewInsets.bottom + 20,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 56,
-                    height: 6,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(3),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 56,
+                      height: 6,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
                     ),
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Categories List',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        letterSpacing: -0.3,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Categories List',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                          letterSpacing: -0.3,
+                        ),
                       ),
-                    ),
-                    Container(
-                      height: 42,
-                      width: 90,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        gradient: LinearGradient(
-                          colors: [
-                            Theme.of(context).primaryColor,
-                            Theme.of(context).primaryColorLight,
+                      Container(
+                        height: 42,
+                        width: 90,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          gradient: LinearGradient(
+                            colors: [
+                              Theme.of(context).primaryColor,
+                              Theme.of(context).primaryColorLight,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Theme.of(context).primaryColor.withOpacity(0.3),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 4),
+                            ),
                           ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).primaryColor.withOpacity(0.3),
-                            blurRadius: 12,
-                            spreadRadius: 2,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () {
-                              Navigator.pop(context);
-                              _showCategoryDialog();
-                            },
-                            splashColor: Colors.white.withOpacity(0.2),
-                            highlightColor: Colors.white.withOpacity(0.1),
-                            child: Center(
-                              child: Text(
-                                'ADD NEW',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                  letterSpacing: 0.4,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height*0.5, // Increased height for better scrolling experience
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: categoryExpenses.length,
-                    itemBuilder: (context, index) {
-                      return ZoomIn(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: HexColor('#2a3b4c'),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
                               borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  spreadRadius: 1,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  // Add category selection logic if needed
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      ZoomIn(
-                                        child: CircleAvatar(
-                                          radius: 18,
-                                          backgroundColor: Colors.teal[600],
-                                          child: Text(
-                                            categoryExpenses[index]['title'][0].toUpperCase(),
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(width: 5.sp,),
-
-
-                                      Expanded(
-                                        child: Text(
-                                          categoryExpenses[index]['title'].toString().toUpperCase(),
-                                          style: GoogleFonts.poppins(
-                                            color: Colors.white,
-                                            fontSize: 13.sp,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Row(
-                                        children: [
-                                          IconButton(
-                                            icon: Icon(
-                                              Icons.edit,
-                                              color: Colors.blue[300],
-                                              size: 22,
-                                            ),
-                                            onPressed: () {
-                                              _showCategoryUpdateDialog(categoryExpenses[index]['title'].toString(),categoryExpenses[index]['id'].toString());
-                                              // Implement edit category logic
-                                             // _showEditCategoryDialog(categoryExpenses[index]);
-                                            },
-                                            tooltip: 'Edit Category',
-                                          ),
-                                          IconButton(
-                                            icon: Icon(Icons.delete,
-                                                size: 20.sp, color: Colors.red),
-                                            onPressed: () => _showDeleteCategory( categoryExpenses[index]['id'].toString(),index),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                              onTap: () {
+                                Navigator.pop(context);
+                                _showCategoryDialog();
+                              },
+                              splashColor: Colors.white.withOpacity(0.2),
+                              highlightColor: Colors.white.withOpacity(0.1),
+                              child: Center(
+                                child: Text(
+                                  'ADD NEW',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                    letterSpacing: 0.4,
                                   ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 16),
-              ],
+                  const SizedBox(height: 20),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height*0.5, // Increased height for better scrolling experience
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: categoryExpenses.length,
+                      itemBuilder: (context, index) {
+                        return ZoomIn(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: HexColor('#2a3b4c'),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 8,
+                                    spreadRadius: 1,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(16),
+                                  onTap: () {
+                                    // Add category selection logic if needed
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        ZoomIn(
+                                          child: CircleAvatar(
+                                            radius: 18,
+                                            backgroundColor: Colors.teal[600],
+                                            child: Text(
+                                              categoryExpenses[index]['title'][0].toUpperCase(),
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 5.sp,),
+
+
+                                        Expanded(
+                                          child: Text(
+                                            categoryExpenses[index]['title'].toString().toUpperCase(),
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(
+                                                Icons.edit,
+                                                color: Colors.blue[300],
+                                                size: 22,
+                                              ),
+                                              onPressed: () {
+                                                _showCategoryUpdateDialog(categoryExpenses[index]['title'].toString(),categoryExpenses[index]['id'].toString());
+                                                // Implement edit category logic
+                                               // _showEditCategoryDialog(categoryExpenses[index]);
+                                              },
+                                              tooltip: 'Edit Category',
+                                            ),
+                                            IconButton(
+                                              icon: Icon(Icons.delete,
+                                                  size: 20.sp, color: Colors.red),
+                                              onPressed: () => _showDeleteCategory( categoryExpenses[index]['id'].toString(),index),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
         ),
@@ -2107,270 +2110,1189 @@ class _ExpensesScreenState extends State<ExpensesScreen>
       ),
     );
   }
+  // void _showDeleteConfirmation(String allowanceId) {
+  //   bool isDeleting = false;
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (context, setState) => AlertDialog(
+  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //         backgroundColor: Colors.white,
+  //         elevation: 8,
+  //         title: Row(
+  //           children: [
+  //             Icon(
+  //               Icons.delete_forever,
+  //               color: Colors.red,
+  //               size: 28,
+  //             ),
+  //             SizedBox(width: 8),
+  //             Text(
+  //               'Delete Expenses',
+  //               style: GoogleFonts.poppins(
+  //                 fontWeight: FontWeight.w600,
+  //                 fontSize: 18,
+  //                 color: Colors.black87,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         content: Padding(
+  //           padding: const EdgeInsets.symmetric(vertical: 12.0),
+  //           child: Text(
+  //             'Are you sure you want to delete this Expenses? This action cannot be undone.',
+  //             style: GoogleFonts.poppins(
+  //               fontSize: 14,
+  //               color: Colors.black54,
+  //             ),
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: isDeleting ? null : () => Navigator.pop(context),
+  //             child: Text(
+  //               'Cancel',
+  //               style: GoogleFonts.poppins(
+  //                 color: Colors.grey[600],
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: isDeleting
+  //                 ? null
+  //                 : () async {
+  //               setState(() => isDeleting = true);
+  //               try {
+  //                 await deleteAllowance(allowanceId);
+  //                 Navigator.pop(context);
+  //                 // ScaffoldMessenger.of(context).showSnackBar(
+  //                 //   SnackBar(
+  //                 //     content: Text('Allowance deleted successfully'),
+  //                 //     backgroundColor: Colors.green,
+  //                 //   ),
+  //                 // );
+  //               } catch (e) {
+  //                 ScaffoldMessenger.of(context).showSnackBar(
+  //                   SnackBar(
+  //                     content: Text('Failed to delete Expenses: $e'),
+  //                     backgroundColor: Colors.red,
+  //                   ),
+  //                 );
+  //               } finally {
+  //                 setState(() => isDeleting = false);
+  //               }
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.red,
+  //               shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //             ),
+  //             child: isDeleting
+  //                 ? SizedBox(
+  //               width: 20,
+  //               height: 20,
+  //               child: CircularProgressIndicator(
+  //                 color: Colors.white,
+  //                 strokeWidth: 2,
+  //               ),
+  //             )
+  //                 : Row(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Icon(Icons.delete, color: Colors.white, size: 18),
+  //                 SizedBox(width: 4),
+  //                 Text(
+  //                   'Delete',
+  //                   style: GoogleFonts.poppins(
+  //                     color: Colors.white,
+  //                     fontWeight: FontWeight.w500,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
   void _showDeleteConfirmation(String allowanceId) {
     bool isDeleting = false;
 
+
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.white,
-          elevation: 8,
-          title: Row(
-            children: [
-              Icon(
-                Icons.delete_forever,
-                color: Colors.red,
-                size: 28,
+      barrierDismissible: false, // Prevent dismissal by tapping outside
+      builder: (context) {
+        TextEditingController controller = TextEditingController();
+        bool isPasswordVisible = false;
+        String enteredPassword = '';
+        bool isLoading = false; // For delete button loading state
+        bool isDeleteEnabled = false; // Enable delete only after valid password entry
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              SizedBox(width: 8),
-              Text(
-                'Delete Expenses',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Text(
-              'Are you sure you want to delete this Expenses? This action cannot be undone.',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isDeleting ? null : () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: isDeleting
-                  ? null
-                  : () async {
-                setState(() => isDeleting = true);
-                try {
-                  await deleteAllowance(allowanceId);
-                  Navigator.pop(context);
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text('Allowance deleted successfully'),
-                  //     backgroundColor: Colors.green,
-                  //   ),
-                  // );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete Expenses: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                } finally {
-                  setState(() => isDeleting = false);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: isDeleting
-                  ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-                  : Row(
-                mainAxisSize: MainAxisSize.min,
+              elevation: 8,
+              backgroundColor: Colors.white,
+              title: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.white, size: 18),
-                  SizedBox(width: 4),
-                  Text(
-                    'Delete',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Delete Expenses",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        Text(
+                          "This action is permanent",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.redAccent, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: const Text(
+                            "Are you sure you want to delete this item? This action cannot be undone and will remove it from your list forever.",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Secure Confirmation",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: controller,
+                    obscureText: !isPasswordVisible,
+                    style: const TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                      labelText: 'Enter your secure password',
+                      labelStyle: TextStyle(color: Colors.grey.shade600),
+                      prefixIcon: Icon(Icons.lock_outline, color: Colors.red),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.red,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.purple.shade200),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.redAccent, width: 2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
+                    ),
+                    onChanged: (value) {
+                      enteredPassword = value;
+                      setState(() {
+                        isDeleteEnabled = value.length >= 6;
+                      });
+                    },
+                  ),
+                  if (!isDeleteEnabled)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        "Password must be at least 6 characters",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  child:  Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: isDeleteEnabled && !isLoading
+                      ? () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    await Future.delayed(const Duration(milliseconds: 800));
+
+                    if (enteredPassword.isNotEmpty) {
+                      try {
+                        // ✅ Call your delete API here
+                        await deleteAllowance(allowanceId,enteredPassword);
+
+                        Navigator.pop(context);
+                        // Fluttertoast.showToast(
+                        //   msg: "Allowance deleted successfully!",
+                        //   toastLength: Toast.LENGTH_SHORT,
+                        //   gravity: ToastGravity.BOTTOM,
+                        //   backgroundColor: Colors.green,
+                        //   textColor: Colors.white,
+                        //   fontSize: 14.0,
+                        // );
+                      } catch (e) {
+                        Fluttertoast.showToast(
+                          msg: "Failed to delete allowance: $e",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                          backgroundColor: Colors.redAccent,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Fluttertoast.showToast(
+                        msg: "Invalid password. Please try again.",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.redAccent,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: isDeleteEnabled ? 3 : 0,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.delete, color: Colors.white, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Delete',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => StatefulBuilder(
+    //     builder: (context, setState) => AlertDialog(
+    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    //       backgroundColor: Colors.white,
+    //       elevation: 8,
+    //       title: Row(
+    //         children: [
+    //           Icon(
+    //             Icons.delete_forever,
+    //             color: Colors.red,
+    //             size: 28,
+    //           ),
+    //           SizedBox(width: 8),
+    //           Text(
+    //             'Delete Allowance',
+    //             style: GoogleFonts.poppins(
+    //               fontWeight: FontWeight.w600,
+    //               fontSize: 18,
+    //               color: Colors.black87,
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //       content: Padding(
+    //         padding: const EdgeInsets.symmetric(vertical: 12.0),
+    //         child: Text(
+    //           'Are you sure you want to delete this allowance? This action cannot be undone.',
+    //           style: GoogleFonts.poppins(
+    //             fontSize: 14,
+    //             color: Colors.black54,
+    //           ),
+    //         ),
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: isDeleting ? null : () => Navigator.pop(context),
+    //           child: Text(
+    //             'Cancel',
+    //             style: GoogleFonts.poppins(
+    //               color: Colors.grey[600],
+    //               fontWeight: FontWeight.w500,
+    //             ),
+    //           ),
+    //         ),
+    //         ElevatedButton(
+    //           onPressed: isDeleting
+    //               ? null
+    //               : () async {
+    //             setState(() => isDeleting = true);
+    //             try {
+    //               await deleteAllowance(allowanceId);
+    //               Navigator.pop(context);
+    //               // ScaffoldMessenger.of(context).showSnackBar(
+    //               //   SnackBar(
+    //               //     content: Text('Allowance deleted successfully'),
+    //               //     backgroundColor: Colors.green,
+    //               //   ),
+    //               // );
+    //             } catch (e) {
+    //               ScaffoldMessenger.of(context).showSnackBar(
+    //                 SnackBar(
+    //                   content: Text('Failed to delete allowance: $e'),
+    //                   backgroundColor: Colors.red,
+    //                 ),
+    //               );
+    //             } finally {
+    //               setState(() => isDeleting = false);
+    //             }
+    //           },
+    //           style: ElevatedButton.styleFrom(
+    //             backgroundColor: Colors.red,
+    //             shape: RoundedRectangleBorder(
+    //               borderRadius: BorderRadius.circular(10),
+    //             ),
+    //             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    //           ),
+    //           child: isDeleting
+    //               ? SizedBox(
+    //             width: 20,
+    //             height: 20,
+    //             child: CircularProgressIndicator(
+    //               color: Colors.white,
+    //               strokeWidth: 2,
+    //             ),
+    //           )
+    //               : Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               Icon(Icons.delete, color: Colors.white, size: 18),
+    //               SizedBox(width: 4),
+    //               Text(
+    //                 'Delete',
+    //                 style: GoogleFonts.poppins(
+    //                   color: Colors.white,
+    //                   fontWeight: FontWeight.w500,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+  }
+
+  Future<void> showInvalidPasswordDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true, // tap outside to dismiss
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          elevation: 10,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 22.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top red icon
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.lock_outline, size: 36, color: Colors.red.shade700),
+                ),
+                const SizedBox(height: 16),
+
+                // Title
+                Text(
+                  'Invalid Password',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.red.shade800,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                // Message
+                const Text(
+                  'The password you entered is incorrect. Please try again.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 18),
+
+                // Buttons row
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // just close
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(); // close and let caller handle retry
+                          // Optionally you could navigate to the retry screen here
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade700,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text('Try Again',style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
-  Future<void> deleteAllowance(String allowanceId) async {
+
+  Future<void> deleteAllowance(String allowanceId, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    print('$password');
 
     final response = await http.post(
-      Uri.parse('${ApiRoutes.deleteExpenses}/$allowanceId'), // Adjust endpoint
-      headers: {'Authorization': 'Bearer $token'},
+      Uri.parse('${ApiRoutes.deleteExpenses}/$allowanceId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'password': password, // ✅ send password in body
+      }),
     );
 
     if (response.statusCode == 200) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Allowance deleted successfully')),
-      // );
-      fetchExpenseData(); // Refresh data
+      Fluttertoast.showToast(
+        msg: "Expenses deleted successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
+      fetchExpenseData(); // ✅ refresh data
     } else {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Failed to delete allowance')),
+      await showInvalidPasswordDialog(context);
+
+      // Fluttertoast.showToast(
+      //   msg: "Failed to delete allowance (${response.statusCode})",
+      //   toastLength: Toast.LENGTH_LONG,
+      //   gravity: ToastGravity.CENTER,
+      //   backgroundColor: Colors.redAccent,
+      //   textColor: Colors.white,
+      //   fontSize: 16.0,
       // );
     }
   }
-  Future<void> deleteCategory(String allowanceId,int index) async {
+
+
+
+  // Future<void> deleteAllowance(String allowanceId) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+  //
+  //   final response = await http.post(
+  //     Uri.parse('${ApiRoutes.deleteExpenses}/$allowanceId'), // Adjust endpoint
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   const SnackBar(content: Text('Allowance deleted successfully')),
+  //     // );
+  //     fetchExpenseData(); // Refresh data
+  //   } else {
+  //     // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   const SnackBar(content: Text('Failed to delete allowance')),
+  //     // );
+  //   }
+  // }
+  // Future<void> deleteCategory(String allowanceId,int index) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final token = prefs.getString('token');
+  //
+  //   final response = await http.post(
+  //     Uri.parse('${ApiRoutes.deleteCategory}/$allowanceId'), // Adjust endpoint
+  //     headers: {'Authorization': 'Bearer $token'},
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       categoryExpenses.removeAt(index);
+  //     });      // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   const SnackBar(content: Text('Allowance deleted successfully')),
+  //     // );
+  //     fetchExpenseCategoryData(); // Refresh data
+  //   } else {
+  //     // ScaffoldMessenger.of(context).showSnackBar(
+  //     //   const SnackBar(content: Text('Failed to delete allowance')),
+  //     // );
+  //   }
+  // }
+
+  Future<void> deleteCategory(String allowanceId,int index, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
+    print('$password');
 
     final response = await http.post(
-      Uri.parse('${ApiRoutes.deleteCategory}/$allowanceId'), // Adjust endpoint
-      headers: {'Authorization': 'Bearer $token'},
+      Uri.parse('${ApiRoutes.deleteCategory}/$allowanceId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'password': password, // ✅ send password in body
+      }),
     );
 
     if (response.statusCode == 200) {
       setState(() {
         categoryExpenses.removeAt(index);
-      });      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Allowance deleted successfully')),
-      // );
+      });
+      Fluttertoast.showToast(
+        msg: "Expenses deleted successfully!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 14.0,
+      );
       fetchExpenseCategoryData(); // Refresh data
     } else {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Failed to delete allowance')),
+      await showInvalidPasswordDialog(context);
+
+      // Fluttertoast.showToast(
+      //   msg: "Failed to delete allowance (${response.statusCode})",
+      //   toastLength: Toast.LENGTH_LONG,
+      //   gravity: ToastGravity.CENTER,
+      //   backgroundColor: Colors.redAccent,
+      //   textColor: Colors.white,
+      //   fontSize: 16.0,
       // );
     }
   }
 
+
+  // void _showDeleteCategory(String allowanceId,int index) {
+  //   bool isDeleting = false;
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => StatefulBuilder(
+  //       builder: (context, setState) => AlertDialog(
+  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  //         backgroundColor: Colors.white,
+  //         elevation: 8,
+  //         title: Row(
+  //           children: [
+  //             Icon(
+  //               Icons.delete_forever,
+  //               color: Colors.red,
+  //               size: 28,
+  //             ),
+  //             SizedBox(width: 8),
+  //             Text(
+  //               'Delete Category',
+  //               style: GoogleFonts.poppins(
+  //                 fontWeight: FontWeight.w600,
+  //                 fontSize: 18,
+  //                 color: Colors.black87,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         content: Padding(
+  //           padding: const EdgeInsets.symmetric(vertical: 12.0),
+  //           child: Text(
+  //             'Are you sure you want to delete this Category? This action cannot be undone.',
+  //             style: GoogleFonts.poppins(
+  //               fontSize: 14,
+  //               color: Colors.black54,
+  //             ),
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: isDeleting ? null : () => Navigator.pop(context),
+  //             child: Text(
+  //               'Cancel',
+  //               style: GoogleFonts.poppins(
+  //                 color: Colors.grey[600],
+  //                 fontWeight: FontWeight.w500,
+  //               ),
+  //             ),
+  //           ),
+  //           ElevatedButton(
+  //             onPressed: isDeleting
+  //                 ? null
+  //                 : () async {
+  //               setState(() => isDeleting = true);
+  //               try {
+  //                 await deleteCategory(allowanceId,index);
+  //                 Navigator.pop(context);
+  //                 // ScaffoldMessenger.of(context).showSnackBar(
+  //                 //   SnackBar(
+  //                 //     content: Text('Allowance deleted successfully'),
+  //                 //     backgroundColor: Colors.green,
+  //                 //   ),
+  //                 // );
+  //               } catch (e) {
+  //                 ScaffoldMessenger.of(context).showSnackBar(
+  //                   SnackBar(
+  //                     content: Text('Failed to delete Expenses: $e'),
+  //                     backgroundColor: Colors.red,
+  //                   ),
+  //                 );
+  //               } finally {
+  //                 setState(() => isDeleting = false);
+  //               }
+  //             },
+  //             style: ElevatedButton.styleFrom(
+  //               backgroundColor: Colors.red,
+  //               shape: RoundedRectangleBorder(
+  //                 borderRadius: BorderRadius.circular(10),
+  //               ),
+  //               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //             ),
+  //             child: isDeleting
+  //                 ? SizedBox(
+  //               width: 20,
+  //               height: 20,
+  //               child: CircularProgressIndicator(
+  //                 color: Colors.white,
+  //                 strokeWidth: 2,
+  //               ),
+  //             )
+  //                 : Row(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 Icon(Icons.delete, color: Colors.white, size: 18),
+  //                 SizedBox(width: 4),
+  //                 Text(
+  //                   'Delete',
+  //                   style: GoogleFonts.poppins(
+  //                     color: Colors.white,
+  //                     fontWeight: FontWeight.w500,
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
   void _showDeleteCategory(String allowanceId,int index) {
     bool isDeleting = false;
 
+
     showDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          backgroundColor: Colors.white,
-          elevation: 8,
-          title: Row(
-            children: [
-              Icon(
-                Icons.delete_forever,
-                color: Colors.red,
-                size: 28,
+      barrierDismissible: false, // Prevent dismissal by tapping outside
+      builder: (context) {
+        TextEditingController controller = TextEditingController();
+        bool isPasswordVisible = false;
+        String enteredPassword = '';
+        bool isLoading = false; // For delete button loading state
+        bool isDeleteEnabled = false; // Enable delete only after valid password entry
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
-              SizedBox(width: 8),
-              Text(
-                'Delete Category',
-                style: GoogleFonts.poppins(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
-            child: Text(
-              'Are you sure you want to delete this Category? This action cannot be undone.',
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: isDeleting ? null : () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.poppins(
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: isDeleting
-                  ? null
-                  : () async {
-                setState(() => isDeleting = true);
-                try {
-                  await deleteCategory(allowanceId,index);
-                  Navigator.pop(context);
-                  // ScaffoldMessenger.of(context).showSnackBar(
-                  //   SnackBar(
-                  //     content: Text('Allowance deleted successfully'),
-                  //     backgroundColor: Colors.green,
-                  //   ),
-                  // );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete Expenses: $e'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                } finally {
-                  setState(() => isDeleting = false);
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: isDeleting
-                  ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
-                  : Row(
-                mainAxisSize: MainAxisSize.min,
+              elevation: 8,
+              backgroundColor: Colors.white,
+              title: Row(
                 children: [
-                  Icon(Icons.delete, color: Colors.white, size: 18),
-                  SizedBox(width: 4),
-                  Text(
-                    'Delete',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Delete Expenses",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        Text(
+                          "This action is permanent",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.redAccent,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.red.withOpacity(0.1)),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, color: Colors.redAccent, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: const Text(
+                            "Are you sure you want to delete this item? This action cannot be undone and will remove it from your list forever.",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black87,
+                              height: 1.4,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Secure Confirmation",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: controller,
+                    obscureText: !isPasswordVisible,
+                    style: const TextStyle(fontSize: 18),
+                    decoration: InputDecoration(
+                      labelText: 'Enter your secure password',
+                      labelStyle: TextStyle(color: Colors.grey.shade600),
+                      prefixIcon: Icon(Icons.lock_outline, color: Colors.red),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.red,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isPasswordVisible = !isPasswordVisible;
+                          });
+                        },
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.purple.shade200),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.redAccent, width: 2),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey.shade50,
+                    ),
+                    onChanged: (value) {
+                      enteredPassword = value;
+                      setState(() {
+                        isDeleteEnabled = value.length >= 6;
+                      });
+                    },
+                  ),
+                  if (!isDeleteEnabled)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: Text(
+                        "Password must be at least 6 characters",
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  child:  Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.grey.shade700,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: isDeleteEnabled && !isLoading
+                      ? () async {
+                    setState(() {
+                      isLoading = true;
+                    });
 
+                    await Future.delayed(const Duration(milliseconds: 800));
+
+                    if (enteredPassword.isNotEmpty) {
+                      try {
+                        // ✅ Call your delete API here
+                        await deleteCategory(allowanceId,index,enteredPassword);
+
+                        Navigator.pop(context);
+                        // Fluttertoast.showToast(
+                        //   msg: "Allowance deleted successfully!",
+                        //   toastLength: Toast.LENGTH_SHORT,
+                        //   gravity: ToastGravity.BOTTOM,
+                        //   backgroundColor: Colors.green,
+                        //   textColor: Colors.white,
+                        //   fontSize: 14.0,
+                        // );
+                      } catch (e) {
+                        Fluttertoast.showToast(
+                          msg: "Failed to delete allowance: $e",
+                          toastLength: Toast.LENGTH_LONG,
+                          gravity: ToastGravity.CENTER,
+                          backgroundColor: Colors.redAccent,
+                          textColor: Colors.white,
+                          fontSize: 16.0,
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    } else {
+                      setState(() {
+                        isLoading = false;
+                      });
+                      Fluttertoast.showToast(
+                        msg: "Invalid password. Please try again.",
+                        toastLength: Toast.LENGTH_LONG,
+                        gravity: ToastGravity.CENTER,
+                        backgroundColor: Colors.redAccent,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                    }
+                  }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: isDeleteEnabled ? 3 : 0,
+                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                      : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.delete, color: Colors.white, size: 18),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Delete',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    // showDialog(
+    //   context: context,
+    //   builder: (context) => StatefulBuilder(
+    //     builder: (context, setState) => AlertDialog(
+    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    //       backgroundColor: Colors.white,
+    //       elevation: 8,
+    //       title: Row(
+    //         children: [
+    //           Icon(
+    //             Icons.delete_forever,
+    //             color: Colors.red,
+    //             size: 28,
+    //           ),
+    //           SizedBox(width: 8),
+    //           Text(
+    //             'Delete Allowance',
+    //             style: GoogleFonts.poppins(
+    //               fontWeight: FontWeight.w600,
+    //               fontSize: 18,
+    //               color: Colors.black87,
+    //             ),
+    //           ),
+    //         ],
+    //       ),
+    //       content: Padding(
+    //         padding: const EdgeInsets.symmetric(vertical: 12.0),
+    //         child: Text(
+    //           'Are you sure you want to delete this allowance? This action cannot be undone.',
+    //           style: GoogleFonts.poppins(
+    //             fontSize: 14,
+    //             color: Colors.black54,
+    //           ),
+    //         ),
+    //       ),
+    //       actions: [
+    //         TextButton(
+    //           onPressed: isDeleting ? null : () => Navigator.pop(context),
+    //           child: Text(
+    //             'Cancel',
+    //             style: GoogleFonts.poppins(
+    //               color: Colors.grey[600],
+    //               fontWeight: FontWeight.w500,
+    //             ),
+    //           ),
+    //         ),
+    //         ElevatedButton(
+    //           onPressed: isDeleting
+    //               ? null
+    //               : () async {
+    //             setState(() => isDeleting = true);
+    //             try {
+    //               await deleteAllowance(allowanceId);
+    //               Navigator.pop(context);
+    //               // ScaffoldMessenger.of(context).showSnackBar(
+    //               //   SnackBar(
+    //               //     content: Text('Allowance deleted successfully'),
+    //               //     backgroundColor: Colors.green,
+    //               //   ),
+    //               // );
+    //             } catch (e) {
+    //               ScaffoldMessenger.of(context).showSnackBar(
+    //                 SnackBar(
+    //                   content: Text('Failed to delete allowance: $e'),
+    //                   backgroundColor: Colors.red,
+    //                 ),
+    //               );
+    //             } finally {
+    //               setState(() => isDeleting = false);
+    //             }
+    //           },
+    //           style: ElevatedButton.styleFrom(
+    //             backgroundColor: Colors.red,
+    //             shape: RoundedRectangleBorder(
+    //               borderRadius: BorderRadius.circular(10),
+    //             ),
+    //             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    //           ),
+    //           child: isDeleting
+    //               ? SizedBox(
+    //             width: 20,
+    //             height: 20,
+    //             child: CircularProgressIndicator(
+    //               color: Colors.white,
+    //               strokeWidth: 2,
+    //             ),
+    //           )
+    //               : Row(
+    //             mainAxisSize: MainAxisSize.min,
+    //             children: [
+    //               Icon(Icons.delete, color: Colors.white, size: 18),
+    //               SizedBox(width: 4),
+    //               Text(
+    //                 'Delete',
+    //                 style: GoogleFonts.poppins(
+    //                   color: Colors.white,
+    //                   fontWeight: FontWeight.w500,
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       ],
+    //     ),
+    //   ),
+    // );
+  }
 
 }
 

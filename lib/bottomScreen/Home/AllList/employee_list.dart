@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:aoneadmin/HexColorCode/HexColor.dart';
 import 'package:aoneadmin/bottomScreen/Home/AllList/sallery_list.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -1091,7 +1092,7 @@ class EmployeeCard extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: EdgeInsets.all(5.sp),
+          padding: EdgeInsets.all(10.sp),
           child: Row(
             children: [
               CircleAvatar(
@@ -1110,13 +1111,42 @@ class EmployeeCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      name,
-                      style: GoogleFonts.poppins(
-                        fontSize: TextSizes.text14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textblack,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          name,
+                          style: GoogleFonts.poppins(
+                            fontSize: TextSizes.text14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textblack,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 5.sp,
+                        ),
+                        Container(
+                          height: 7.sp,
+                          width: 7.sp,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.sp),
+                            color: status == '1' ? Colors.green : Colors.red,
+
+                          ),
+                          // child: Padding(
+                          //   padding:  EdgeInsets.all(3.sp),
+                          //   child: Text(
+                          //     status == '1' ? 'Active' : 'Inactive',
+                          //     style: GoogleFonts.poppins(
+                          //       fontSize: 8.sp,
+                          //       fontWeight: FontWeight.w600,
+                          //       color: AppColors.textWhite,
+                          //     ),
+                          //   ),
+                          // ),
+                        ),
+
+
+                      ],
                     ),
                     Text(
                       base,
@@ -1126,20 +1156,363 @@ class EmployeeCard extends StatelessWidget {
                         color: HexColor('#1f2937'),
                       ),
                     ),
+
+
                   ],
                 ),
               ),
-              Chip(
-                label: Text(
-                  status == '1' ? 'Active' : 'Inactive',
-                  style: GoogleFonts.poppins(
-                    fontSize: TextSizes.text13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textWhite,
-                  ),
-                ),
-                backgroundColor: status == '1' ? Colors.green : Colors.red,
+              SizedBox(
+                width: 10.sp,
               ),
+
+              // PopupMenuButton<String>(
+              //   shape: RoundedRectangleBorder(
+              //     borderRadius: BorderRadius.circular(16),
+              //   ),
+              //   color: Colors.white,
+              //   elevation: 6,
+              //   onSelected: (value) async {
+              //     if (value == 'edit') {
+              //       // ✅ Edit Popup
+              //       showDialog(
+              //         context: context,
+              //         builder: (context) {
+              //           return AlertDialog(
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(20),
+              //             ),
+              //             title: Row(
+              //               children: [
+              //                 Icon(Icons.edit_note, color: Colors.blueAccent, size: 26),
+              //                 SizedBox(width: 8),
+              //                 Text(
+              //                   "Edit Options",
+              //                   style: TextStyle(fontWeight: FontWeight.bold),
+              //                 ),
+              //               ],
+              //             ),
+              //             content: Column(
+              //               mainAxisSize: MainAxisSize.min,
+              //               children: [
+              //                 ListTile(
+              //                   leading: Icon(Icons.title, color: Colors.blueAccent),
+              //                   title: Text("Edit Title"),
+              //                   onTap: () {
+              //                     Navigator.pop(context);
+              //                     print("Edit Title Clicked");
+              //                   },
+              //                 ),
+              //                 Divider(),
+              //                 ListTile(
+              //                   leading: Icon(Icons.description, color: Colors.green),
+              //                   title: Text("Edit Description"),
+              //                   onTap: () {
+              //                     Navigator.pop(context);
+              //                     print("Edit Description Clicked");
+              //                   },
+              //                 ),
+              //                 Divider(),
+              //                 ListTile(
+              //                   leading: Icon(Icons.image, color: Colors.orange),
+              //                   title: Text("Edit Image"),
+              //                   onTap: () {
+              //                     Navigator.pop(context);
+              //                     print("Edit Image Clicked");
+              //                   },
+              //                 ),
+              //               ],
+              //             ),
+              //           );
+              //         },
+              //       );
+              //     } else if (value == 'delete') {
+              //
+              //       showDialog(
+              //         context: context,
+              //         barrierDismissible: false, // Prevent dismissal by tapping outside
+              //         builder: (context) {
+              //           TextEditingController controller = TextEditingController();
+              //           bool isPasswordVisible = false;
+              //           String enteredPassword = '';
+              //           bool isLoading = false; // For delete button loading state
+              //           bool isDeleteEnabled = false; // Enable delete only after valid password entry
+              //
+              //           return StatefulBuilder(
+              //             builder: (context, setState) {
+              //               return AlertDialog(
+              //                 shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(20),
+              //                 ),
+              //                 elevation: 8,
+              //                 backgroundColor: Colors.white,
+              //                 title: Row(
+              //                   children: [
+              //                     Container(
+              //                       padding: const EdgeInsets.all(8),
+              //                       decoration: BoxDecoration(
+              //                         color: Colors.red.withOpacity(0.1),
+              //                         shape: BoxShape.circle,
+              //                       ),
+              //                       child: Icon(
+              //                         Icons.warning_amber_rounded,
+              //                         color: Colors.redAccent,
+              //                         size: 28,
+              //                       ),
+              //                     ),
+              //                     const SizedBox(width: 12),
+              //                     Expanded(
+              //                       child: Column(
+              //                         crossAxisAlignment: CrossAxisAlignment.start,
+              //                         children: [
+              //                           const Text(
+              //                             "Delete Item",
+              //                             style: TextStyle(
+              //                               fontWeight: FontWeight.bold,
+              //                               fontSize: 20,
+              //                             ),
+              //                           ),
+              //                           Text(
+              //                             "This action is permanent",
+              //                             style: TextStyle(
+              //                               fontSize: 12,
+              //                               color: Colors.redAccent,
+              //                               fontWeight: FontWeight.w500,
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                   ],
+              //                 ),
+              //                 content: Column(
+              //                   mainAxisSize: MainAxisSize.min,
+              //                   crossAxisAlignment: CrossAxisAlignment.start,
+              //                   children: [
+              //                     Container(
+              //                       padding: const EdgeInsets.all(16),
+              //                       decoration: BoxDecoration(
+              //                         color: Colors.red.withOpacity(0.05),
+              //                         borderRadius: BorderRadius.circular(12),
+              //                         border: Border.all(color: Colors.red.withOpacity(0.1)),
+              //                       ),
+              //                       child: Row(
+              //                         children: [
+              //                           Icon(Icons.info_outline, color: Colors.redAccent, size: 20),
+              //                           const SizedBox(width: 8),
+              //                           Expanded(
+              //                             child: const Text(
+              //                               "Are you sure you want to delete this item? This action cannot be undone and will remove it from your list forever.",
+              //                               style: TextStyle(
+              //                                 fontSize: 15,
+              //                                 color: Colors.black87,
+              //                                 height: 1.4,
+              //                               ),
+              //                             ),
+              //                           ),
+              //                         ],
+              //                       ),
+              //                     ),
+              //                     const SizedBox(height: 20),
+              //                     Text(
+              //                       "Secure Confirmation",
+              //                       style: TextStyle(
+              //                         fontWeight: FontWeight.bold,
+              //                         color: Colors.red,
+              //                         fontSize: 16,
+              //                       ),
+              //                     ),
+              //                     const SizedBox(height: 8),
+              //                     TextField(
+              //                       controller: controller,
+              //                       obscureText: !isPasswordVisible,
+              //                       style: const TextStyle(fontSize: 18),
+              //                       decoration: InputDecoration(
+              //                         labelText: 'Enter your secure password',
+              //                         labelStyle: TextStyle(color: Colors.grey.shade600),
+              //                         prefixIcon: Icon(Icons.lock_outline, color: Colors.red),
+              //                         suffixIcon: IconButton(
+              //                           icon: Icon(
+              //                             isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+              //                             color: Colors.red,
+              //                           ),
+              //                           onPressed: () {
+              //                             setState(() {
+              //                               isPasswordVisible = !isPasswordVisible;
+              //                             });
+              //                           },
+              //                         ),
+              //                         border: OutlineInputBorder(
+              //                           borderRadius: BorderRadius.circular(15),
+              //                           borderSide: BorderSide(color: Colors.purple.shade200),
+              //                         ),
+              //                         focusedBorder: OutlineInputBorder(
+              //                           borderRadius: BorderRadius.circular(15),
+              //                           borderSide: BorderSide(color: Colors.redAccent, width: 2),
+              //                         ),
+              //                         enabledBorder: OutlineInputBorder(
+              //                           borderRadius: BorderRadius.circular(15),
+              //                           borderSide: BorderSide(color: Colors.grey.shade300),
+              //                         ),
+              //                         filled: true,
+              //                         fillColor: Colors.grey.shade50,
+              //                       ),
+              //                       onChanged: (value) {
+              //                         enteredPassword = value;
+              //                         setState(() {
+              //                           isDeleteEnabled = value.length >= 6;
+              //                         });
+              //                       },
+              //                     ),
+              //                     if (!isDeleteEnabled)
+              //                       Padding(
+              //                         padding: const EdgeInsets.only(top: 8),
+              //                         child: Text(
+              //                           "Password must be at least 6 characters",
+              //                           style: TextStyle(
+              //                             fontSize: 12,
+              //                             color: Colors.redAccent,
+              //                           ),
+              //                         ),
+              //                       ),
+              //                   ],
+              //                 ),
+              //                 actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              //                 actions: [
+              //                   TextButton(
+              //                     onPressed: () => Navigator.pop(context),
+              //                     style: TextButton.styleFrom(
+              //                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              //                       shape: RoundedRectangleBorder(
+              //                         borderRadius: BorderRadius.circular(12),
+              //                       ),
+              //                       side: BorderSide(color: Colors.grey.shade300),
+              //                     ),
+              //                     child:  Text(
+              //                       "Cancel",
+              //                       style: TextStyle(
+              //                         color: Colors.grey.shade700,
+              //                         fontWeight: FontWeight.w500,
+              //                       ),
+              //                     ),
+              //                   ),
+              //                   const SizedBox(width: 8),
+              //                   ElevatedButton(
+              //                     onPressed: isDeleteEnabled && !isLoading
+              //                         ? () async {
+              //                       setState(() {
+              //                         isLoading = true;
+              //                       });
+              //                       // Simulate a brief delay for realism (replace with actual password verification)
+              //                       await Future.delayed(const Duration(milliseconds: 800));
+              //
+              //                       if (enteredPassword.isNotEmpty) {
+              //                         // Here, verify the password against your actual logic
+              //                         // For example: if (await verifyPassword(enteredPassword)) { ... }
+              //
+              //                         // For demo, assume it's valid
+              //                         Navigator.of(context).pop(enteredPassword);
+              //                         Fluttertoast.showToast(
+              //                           msg: "Item deleted successfully!",
+              //                           toastLength: Toast.LENGTH_SHORT,
+              //                           gravity: ToastGravity.BOTTOM,
+              //                           backgroundColor: Colors.green,
+              //                           textColor: Colors.white,
+              //                           fontSize: 14.0,
+              //                         );
+              //                       } else {
+              //                         setState(() {
+              //                           isLoading = false;
+              //                         });
+              //                         Fluttertoast.showToast(
+              //                           msg: "Invalid password. Please try again.",
+              //                           toastLength: Toast.LENGTH_LONG,
+              //                           gravity: ToastGravity.CENTER,
+              //                           backgroundColor: Colors.redAccent,
+              //                           textColor: Colors.white,
+              //                           fontSize: 16.0,
+              //                         );
+              //                       }
+              //                     }
+              //                         : null,
+              //                     style: ElevatedButton.styleFrom(
+              //                       backgroundColor: Colors.red,
+              //                       foregroundColor: Colors.white,
+              //                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              //                       shape: RoundedRectangleBorder(
+              //                         borderRadius: BorderRadius.circular(12),
+              //                       ),
+              //                       elevation: isDeleteEnabled ? 2 : 0,
+              //                     ),
+              //                     child: isLoading
+              //                         ? const SizedBox(
+              //                       height: 20,
+              //                       width: 20,
+              //                       child: CircularProgressIndicator(
+              //                         color: Colors.white,
+              //                         strokeWidth: 2,
+              //                       ),
+              //                     )
+              //                         : const Text(
+              //                       'Delete',
+              //                       style: TextStyle(
+              //                         fontSize: 16,
+              //                         fontWeight: FontWeight.bold,
+              //                       ),
+              //                     ),
+              //                   ),
+              //                 ],
+              //               );
+              //             },
+              //           );
+              //         },
+              //       );
+              //
+              //     }
+              //   },
+              //   itemBuilder: (BuildContext context) {
+              //     return [
+              //       PopupMenuItem(
+              //         value: 'edit',
+              //         child: Row(
+              //           children: [
+              //             Icon(Icons.edit, color: Colors.blueAccent),
+              //             SizedBox(width: 10),
+              //             Text(
+              //               "Edit",
+              //               style: TextStyle(
+              //                 fontSize: 16,
+              //                 fontWeight: FontWeight.w500,
+              //                 color: Colors.black87,
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //       PopupMenuDivider(),
+              //       PopupMenuItem(
+              //         value: 'delete',
+              //         child: Row(
+              //           children: [
+              //             Icon(Icons.delete, color: Colors.redAccent),
+              //             SizedBox(width: 10),
+              //             Text(
+              //               "Delete",
+              //               style: TextStyle(
+              //                 fontSize: 16,
+              //                 fontWeight: FontWeight.w500,
+              //                 color: Colors.redAccent,
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ];
+              //   },
+              //   child: Icon(
+              //     Icons.more_vert,
+              //     color: Colors.black87,
+              //   ),
+              // )
             ],
           ),
         ),

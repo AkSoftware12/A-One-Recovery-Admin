@@ -42,14 +42,13 @@ class ApiRoutes {
 
 
   // Main App Url
-  // static const String baseUrl = "https://aone.akdesire.com/api";
-  static const String baseUrl = "https://aonerecovery.in/api";
+  // static const String baseUrl = "https://aonerecovery.in/api";
+  //test
+  // static const String baseUrl = "https://app.aonerecovery.in/api";
 
 
 // Local  App Url
-
-
-  // static const String baseUrl = "http://192.168.1.4/CJM/api";
+  static const String baseUrl = "http://192.168.1.2/aone/api";
 
 
 
@@ -89,7 +88,7 @@ class ApiRoutes {
 
   static const String getSalaryList = "$baseUrl/admin/salary-list";
   static const String genrateSalary = "$baseUrl/admin/salary-genrate";
-  static const String genrateSlip = "$baseUrl/admin/salary-slip/";
+  static const String genrateSlip = "$baseUrl/salary-slip/";
 
 
 
@@ -116,7 +115,13 @@ class ApiRoutes {
 
 
   static const String attendanceCreate = "$baseUrl/admin/attandance-create";
-
-
   static const String notifications = "$baseUrl/notifications";
+
+
+ // Report Api
+
+  static const String bktWiseReport = "$baseUrl/admin/bkt-wise-report";
+  static const String bktWiseFosCountReport = "$baseUrl/admin/bkt-wise-fos-counts";
+  static const String bktWiseFosAmountReport = "$baseUrl/admin/bkt-wise-fos-report";
+  static const String productWiseBuketReport = "$baseUrl/admin/bkt-wise-product-report";
 }

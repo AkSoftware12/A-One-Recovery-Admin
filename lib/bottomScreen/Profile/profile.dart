@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aoneadmin/Auth/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -274,13 +275,14 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
                   // Logout Button
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      final prefs = await SharedPreferences.getInstance();
+                      prefs.clear();
                       Navigator.pop(context); // Close dialog
-                      // Add your logout logic here
-                      // Navigator.pushReplacement(
-                      //   context,
-                      //   MaterialPageRoute(builder: (context) => LoginScreen()),
-                      // );
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(

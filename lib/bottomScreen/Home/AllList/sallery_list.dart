@@ -884,6 +884,7 @@ class _ExpensesScreenState extends State<SalaryScreen>
                             salary['total_allowance'].toString(),
                             salary['total_deduction'].toString(),
                             salary['net_salary'].toString(),
+                            salary['id'].toString(),
                           ),
                         );
                       },
@@ -904,6 +905,7 @@ class _ExpensesScreenState extends State<SalaryScreen>
     String allowance,
     String deduction,
     String netSalary,
+    String id,
   ) {
     return GestureDetector(
       onTap: () {
@@ -1048,13 +1050,11 @@ class _ExpensesScreenState extends State<SalaryScreen>
                     ),
 
                     onPressed: () async {
-                      final Uri uri = Uri.parse(ApiRoutes.genrateSlip);
+                      final Uri uri = Uri.parse('${ApiRoutes.genrateSlip}${id}');
                       try {
                         if (!await launchUrl(uri,
                             mode: LaunchMode.externalApplication)) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Could not open URL')),
-                          );
+
                         }
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
