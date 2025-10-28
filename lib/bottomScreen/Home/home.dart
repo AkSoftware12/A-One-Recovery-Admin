@@ -1324,15 +1324,15 @@ class _BottomCardState extends State<BottomCard> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Container(
-                              width: 45.sp, // Size
-                              height: 45.sp,
+                              width: 40.sp, // Size
+                              height: 40.sp,
                               decoration: BoxDecoration(
                                 color: item['color'],
                                 shape: BoxShape.circle,
                               ),
                               child: Center(child: item["icon"]),
                             ),
-                            SizedBox(height: 8.sp),
+                            SizedBox(height: 5.sp),
                             Center(
                               child: Column(
                                 children: [

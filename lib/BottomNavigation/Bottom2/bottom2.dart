@@ -10,6 +10,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../Auth/login_screen.dart';
 import '../../HexColorCode/HexColor.dart';
+import '../../Notification/notification.dart';
 import '../../Widget/AppBar/appBar.dart';
 import '../../bottomScreen/Allotment/allotment.dart';
 import '../../bottomScreen/Attendance/AttendanceScreen.dart';
@@ -362,7 +363,7 @@ class _ProvidedStylesExampleState extends State<ProvidedStylesExample> {
                 context,
                 MaterialPageRoute(
                   builder: (context) {
-                    return LoanPage();
+                    return RecoveryNotificationScreen();
                   },
                 ),
               );
